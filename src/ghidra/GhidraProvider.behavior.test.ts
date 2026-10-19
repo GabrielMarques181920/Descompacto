@@ -350,6 +350,7 @@ describe("Ghidra provider", () => {
             expect.stringContaining(
               "unresolved targetless flows remain unknown",
             ),
+            expect.stringContaining("blocks fresh import"),
           ]),
         }),
       ]),
@@ -454,6 +455,7 @@ describe("Ghidra raw-binary profile", () => {
       profile: {
         parameters: {
           target_format: "raw-binary",
+          runtime_recovery_limitations: "cleanup-qualified-reimport-v1",
           architecture: "arm",
           loader: "BinaryLoader",
           language_id: "ARM:LE:32:v7",
@@ -1098,6 +1100,7 @@ describe("Ghidra client projection", () => {
       provider: { id: "ghidra", name: "Ghidra", version: "12.1.4" },
       parameters: {
         import_mode: "ephemeral-source-immutable",
+        runtime_recovery_limitations: "cleanup-qualified-reimport-v1",
         annotation_policy: "atomic-function-entry-metadata-v1",
         analyzer_preset: "ghidra-default",
       },
