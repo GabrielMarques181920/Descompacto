@@ -596,7 +596,11 @@ itWithCaptureCapability(
       controller.signal,
     );
     if (cancelled.ok) throw new Error("expected cancellation");
-    expect(cancelled.error.message).toContain("cancelled");
+    expect(cancelled.error).toMatchObject({
+      reason: "cancelled",
+      userCategory: "cancelled",
+    });
+    expect(projectAnalysisError(cancelled.error).category).toBe("cancelled");
   },
 );
 
