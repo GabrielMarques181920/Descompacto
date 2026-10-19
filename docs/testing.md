@@ -1445,6 +1445,31 @@ unknown chunks, depth limits and extracted child digests. The optional
 Neither optional toolchain is a base-lane prerequisite. See
 [firmware analysis](firmware-analysis.md) for limits and unverified formats.
 
+### JavaScript loader delegate differential lane
+
+`src/domain/javascript/loaderDelegateDifferential.test.ts` and
+`src/domain/javascript/loaderDelegateFuzz.test.ts` run CommonJS sources twice:
+through Node's real CommonJS loader in a fresh worker thread with only the
+`electron` package stubbed (`tests/support/javascript/loaderDelegateOracle.ts`
+writes the source as `bundle.cjs` beside a `node_modules/electron` stub and
+requires it from a worker, a separate isolate with its own loader, so
+`require`, `module.require`, `Module.prototype.require` and `Module._load`
+are genuine and one case's prototype mutations never reach the next), and
+through the production parser and analyzer. The corpus file
+asserts agreement for every listed case and owns two explicit exception
+lists: known precision limits, where the runtime keeps the original API and
+the analyzer stays conservative, and known false findings, where the runtime
+replaces the loader and the analyzer still reports it. An entry that starts
+agreeing fails until it is removed, so fixes and regressions in either
+direction surface in one place. Add a review finding as one corpus line; the
+harness decides which list it belongs to.
+
+The fuzz file composes the same mutation fragments at random with a fixed
+seed and fails only on a false finding; it logs agreed, conservative and
+skipped counts. `REA_LOADER_FUZZ_CASES` scales the run and
+`REA_LOADER_FUZZ_SEED` selects a seed, so a printed counterexample reproduces.
+Both run in the ordinary `domain` project without a build.
+
 ### JavaScript source recovery
 
 Build once with `npm run build:cached`, then run `npm run verify:javascript:recovery`.

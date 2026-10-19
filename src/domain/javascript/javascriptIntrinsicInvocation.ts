@@ -6,18 +6,31 @@ import {
   unwrapJavaScriptExpression,
 } from "./javascriptAstValues.js";
 
-/** Expand only literal array spreads whose positional arguments are all known. */
+/** Whether one spread element's array iteration is proven intact at that site. */
+export type JavaScriptSpreadIntegrity = (spread: t.SpreadElement) => boolean;
+
+/**
+ * Expand a literal array spread into positional arguments only when the
+ * caller's mutation facts prove array iteration intact at that spread.
+ * Spreading runs the array iterator, which earlier source may replace through
+ * `Array.prototype[Symbol.iterator]` or the shared array iterator prototype,
+ * so the syntactic elements are otherwise not proof of the values the call
+ * receives. A remaining spread element is an unknown argument list.
+ */
 export const expandJavaScriptInvocationArguments = (
   arguments_: readonly t.CallExpression["arguments"][number][],
+  spreadIntact: JavaScriptSpreadIntegrity | undefined,
 ): t.CallExpression["arguments"] => {
+  if (spreadIntact === undefined) return [...arguments_];
   const expanded: t.CallExpression["arguments"] = [];
   const pending = [...arguments_].reverse();
   while (pending.length > 0) {
     const argument = pending.pop();
     if (argument === undefined) break;
-    const array = t.isSpreadElement(argument)
-      ? unwrapJavaScriptExpression(argument.argument).node
-      : undefined;
+    const array =
+      t.isSpreadElement(argument) && spreadIntact(argument)
+        ? unwrapJavaScriptExpression(argument.argument).node
+        : undefined;
     if (
       t.isArrayExpression(array) &&
       array.elements.every(
@@ -33,7 +46,11 @@ export const expandJavaScriptInvocationArguments = (
   return expanded;
 };
 
-const arrayArguments = (node: t.Node | undefined) => {
+/** `apply` reads its array argument by index; holes and spreads stay unknown. */
+const arrayArguments = (
+  node: t.Node | undefined,
+  spreadIntact: JavaScriptSpreadIntegrity | undefined,
+) => {
   const array =
     node === undefined ? undefined : unwrapJavaScriptExpression(node).node;
   if (
@@ -45,6 +62,7 @@ const arrayArguments = (node: t.Node | undefined) => {
     array.elements.filter(
       (element): element is t.Expression | t.SpreadElement => element !== null,
     ),
+    spreadIntact,
   );
   return expanded.every((element) => t.isExpression(element))
     ? expanded.filter((element): element is t.Expression =>
@@ -56,28 +74,51 @@ const arrayArguments = (node: t.Node | undefined) => {
 const invocationArguments = (
   method: "call" | "apply",
   arguments_: JavaScriptIntrinsicInvocation["arguments"],
+  spreadIntact: JavaScriptSpreadIntegrity | undefined,
 ) =>
   t.isSpreadElement(arguments_?.[0])
     ? undefined
     : method === "apply"
-      ? arrayArguments(arguments_?.[1])
+      ? arrayArguments(arguments_?.[1], spreadIntact)
       : arguments_?.slice(1);
+
+/** A helper selection retains its physical bound owner and every member read. */
+export interface JavaScriptBoundHelperRead {
+  readonly value: NonNullable<JavaScriptIntrinsicInvocation["boundFunction"]>;
+  readonly projection: readonly string[];
+}
 
 /**
  * Normalize known invocation syntax once, retaining bound argument prefixes.
  * Binding a function alone is not a write; only its eventual call is examined.
  */
 export const resolveJavaScriptIntrinsicInvocation = (
-  node: t.CallExpression | t.OptionalCallExpression,
+  node:
+    | t.CallExpression
+    | t.OptionalCallExpression
+    | t.TaggedTemplateExpression,
   intrinsicPath: (node: t.Node) => readonly string[] | undefined,
   boundIntrinsic: (node: t.Node) => JavaScriptIntrinsicInvocation | undefined,
-  intrinsicReadChanged: (node: t.Node, path: readonly string[]) => boolean,
+  intrinsicReadChanged: (
+    node: t.Node,
+    path: readonly string[],
+    boundHelper?: JavaScriptBoundHelperRead,
+  ) => boolean,
+  /** Proof that a spread's array iteration is intact; absent keeps spreads opaque. */
+  spreadIntact?: JavaScriptSpreadIntegrity,
 ): JavaScriptIntrinsicInvocation | undefined => {
   const visited = new Set<t.Node>();
-  let callee: t.Node = node.callee;
+  let callee: t.Node = t.isTaggedTemplateExpression(node)
+    ? node.tag
+    : node.callee;
   let arguments_: JavaScriptIntrinsicInvocation["arguments"] =
-    expandJavaScriptInvocationArguments(node.arguments);
+    // The template object is a runtime allocation, not a source expression.
+    // Retain its callable/receiver without inventing positional argument facts.
+    t.isTaggedTemplateExpression(node)
+      ? undefined
+      : expandJavaScriptInvocationArguments(node.arguments, spreadIntact);
   let receiver: t.Node | undefined;
+  const callableReads: t.Node[] = [];
   let explicitReceiver = false;
   for (;;) {
     callee = unwrapJavaScriptExpression(callee).node;
@@ -94,33 +135,58 @@ export const resolveJavaScriptIntrinsicInvocation = (
     visited.add(callee);
     let path = intrinsicPath(callee);
     if (path !== undefined && intrinsicReadChanged(callee, path))
-      return { kind: "opaque", path, arguments: undefined };
+      // Callable identity uncertainty does not change the receiver selected by
+      // an ordinary member call or by an already-proven invocation helper.
+      return {
+        kind: "opaque",
+        path,
+        arguments: undefined,
+        ...(callableReads.length === 0 ? {} : { callableReads }),
+        ...(receiver === undefined ? {} : { receiver }),
+        ...(!explicitReceiver &&
+        (t.isMemberExpression(callee) || t.isOptionalMemberExpression(callee))
+          ? { memberReceiver: callee.object }
+          : {}),
+      };
     if (path === undefined) {
-      if (
-        t.isMemberExpression(callee) ||
-        t.isOptionalMemberExpression(callee)
+      let helperTarget: t.Node = callee;
+      const helpers: string[] = [];
+      while (
+        t.isMemberExpression(helperTarget) ||
+        t.isOptionalMemberExpression(helperTarget)
       ) {
         const method = semanticStaticPropertyKey(
-          callee.property,
-          callee.computed,
+          helperTarget.property,
+          helperTarget.computed,
         );
-        if (method === "call" || method === "apply") {
-          const bound = boundIntrinsic(callee.object);
+        if (method !== "call" && method !== "apply" && method !== "bind") break;
+        helpers.push(method);
+        helperTarget = unwrapJavaScriptExpression(helperTarget.object).node;
+      }
+      if (helpers.length > 0) {
+        helpers.reverse();
+        const bound = boundIntrinsic(helperTarget);
+        if (bound !== undefined) {
           if (
-            bound !== undefined &&
-            intrinsicReadChanged(callee, [...bound.path, method])
+            bound.kind === "opaque" ||
+            bound.boundFunction === undefined ||
+            intrinsicReadChanged(callee, [...bound.path, ...helpers], {
+              value: bound.boundFunction,
+              projection: helpers,
+            })
           )
             return { kind: "opaque", path: bound.path, arguments: undefined };
-          receiver = arguments_?.[0];
-          explicitReceiver = true;
-          callee = callee.object;
-          arguments_ = invocationArguments(method, arguments_);
-          continue;
+          // After proving the whole selection, normalize the selected generic
+          // helper with its actual receiver, just like an unbound helper value.
+          path = ["intrinsic", "Function", "prototype", ...helpers];
         }
       }
+    }
+    if (path === undefined) {
       const bound = boundIntrinsic(callee);
       if (bound === undefined) return undefined;
       if (bound.kind === "opaque") return bound;
+      callableReads.push(...(bound.callableReads ?? []));
       path = bound.path;
       receiver = bound.receiver;
       explicitReceiver = true;
@@ -143,7 +209,7 @@ export const resolveJavaScriptIntrinsicInvocation = (
       callee = callable;
       receiver = arguments_?.[0];
       explicitReceiver = true;
-      arguments_ = invocationArguments(method, arguments_);
+      arguments_ = invocationArguments(method, arguments_, spreadIntact);
       continue;
     }
     if (path.join(".") === "intrinsic.Reflect.apply") {
@@ -152,14 +218,21 @@ export const resolveJavaScriptIntrinsicInvocation = (
       callee = callable;
       receiver = arguments_?.[1];
       explicitReceiver = true;
-      arguments_ = arrayArguments(arguments_?.[2]);
+      arguments_ = arrayArguments(arguments_?.[2], spreadIntact);
       continue;
     }
+    const memberReceiver =
+      !explicitReceiver &&
+      (t.isMemberExpression(callee) || t.isOptionalMemberExpression(callee))
+        ? callee.object
+        : undefined;
     return {
       kind: "known",
       path,
       arguments: arguments_,
+      ...(callableReads.length === 0 ? {} : { callableReads }),
       ...(receiver === undefined ? {} : { receiver }),
+      ...(memberReceiver === undefined ? {} : { memberReceiver }),
     };
   }
 };
