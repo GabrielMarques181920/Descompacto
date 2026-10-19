@@ -129,6 +129,13 @@ import {
   dartAotViewContextSchema,
 } from "./dartAotView.js";
 import {
+  browserScenarioSummarySchema,
+  browserScenarioViewContextSchema,
+  browserScenarioViewPageSchema,
+  browserScenarioViewRequestSchema,
+} from "./browserScenarioViewSchemas.js";
+import { projectBrowserScenarioView } from "./browserScenarioView.js";
+import {
   projectIl2cppMetadataView,
   il2cppMetadataSummarySchema,
   il2cppMetadataViewRequestSchema,
@@ -260,6 +267,7 @@ export const analysisViewRequestSchema = z.discriminatedUnion("kind", [
   qlogViewRequestSchema,
   pcapViewRequestSchema,
   dartAotViewRequestSchema,
+  browserScenarioViewRequestSchema,
   il2cppMetadataViewRequestSchema,
 ]);
 
@@ -382,6 +390,7 @@ const viewResultBase = {
     "inspect_android_package",
     "inspect_pcap_capture",
     "inspect_dart_aot",
+    "capture_browser_scenario",
     "inspect_il2cpp_metadata",
   ]),
   parent_digest: digestSchema,
@@ -561,6 +570,7 @@ export const analysisViewResultSchema = z.discriminatedUnion("kind", [
       androidPackageSummarySchema,
       pcapSummarySchema,
       dartAotSummarySchema,
+      browserScenarioSummarySchema,
       il2cppMetadataSummarySchema,
     ]),
   }),
@@ -683,6 +693,14 @@ export const analysisViewResultSchema = z.discriminatedUnion("kind", [
     parent_operation: z.literal("inspect_dart_aot"),
   }),
   z.strictObject({
+    kind: z.literal("browser-scenario"),
+    view: browserScenarioViewRequestSchema,
+    page: browserScenarioViewPageSchema,
+    ...viewResultBase,
+    ...browserScenarioViewContextSchema.shape,
+    parent_operation: z.literal("capture_browser_scenario"),
+  }),
+  z.strictObject({
     kind: z.literal("il2cpp-metadata"),
     view: il2cppMetadataViewRequestSchema,
     items: il2cppMetadataViewItemsSchema,
@@ -797,6 +815,10 @@ export type UnsignedAnalysisView =
       "view_digest"
     >
   | Omit<
+      Extract<AnalysisViewResult, { readonly kind: "browser-scenario" }>,
+      "view_digest"
+    >
+  | Omit<
       Extract<AnalysisViewResult, { readonly kind: "il2cpp-metadata" }>,
       "view_digest"
     >;
@@ -844,9 +866,7 @@ const unsupportedParent = (
   new AnalysisUnsupportedTargetError(
     INSPECT_ANALYSIS_VIEW_OPERATION,
     parentArtifactPath(parent),
-    parent.operation === "capture_browser_scenario"
-      ? `Parent Evidence operation "capture_browser_scenario" supports only the environment-manifest view.`
-      : `Parent Evidence operation ${JSON.stringify(parent.operation)} does not support analysis views. Use completed binary layout, JavaScript application, native function, artifact inventory/inspection, WASM, Mach-O, Interface Builder, EVM, managed artifact or member, Android package, Dart AOT, IL2CPP metadata, or web network capture Evidence.`,
+    `Parent Evidence operation ${JSON.stringify(parent.operation)} does not support analysis views. Use completed binary layout, JavaScript application, native function, artifact inventory/inspection, WASM, Mach-O, Interface Builder, EVM, managed artifact or member, Android package, Dart AOT, IL2CPP metadata, web network capture, or browser scenario capture Evidence.`,
   );
 
 const parentArtifactPath = (parent: AnalysisViewParent): string => {
@@ -884,6 +904,7 @@ const retainedViewProjectors = new Map<string, typeof projectWasmArtifactView>([
   ["inspect_il2cpp_metadata", projectIl2cppMetadataView],
   ["inspect_artifact", projectArtifactInventoryView],
   ["inventory_artifact", projectArtifactInventoryView],
+  ["capture_browser_scenario", projectBrowserScenarioView],
 ]);
 
 /** Project one selected view from authenticated parent analysis Evidence. */
