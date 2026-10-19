@@ -135,6 +135,13 @@ import {
   il2cppMetadataViewContextSchema,
   il2cppMetadataViewItemsSchema,
 } from "./il2cppMetadataView.js";
+import {
+  projectUnrealPakView,
+  unrealPakSummarySchema,
+  unrealPakViewRequestSchema,
+  unrealPakViewContextSchema,
+  unrealPakViewItemsSchema,
+} from "./unrealPakView.js";
 
 const summaryViewSchema = z.strictObject({ kind: z.literal("summary") });
 const facetViewSchema = z.strictObject({
@@ -261,6 +268,7 @@ export const analysisViewRequestSchema = z.discriminatedUnion("kind", [
   pcapViewRequestSchema,
   dartAotViewRequestSchema,
   il2cppMetadataViewRequestSchema,
+  unrealPakViewRequestSchema,
 ]);
 
 // The application owns admission and authenticated Evidence parsing. SDK and
@@ -383,6 +391,7 @@ const viewResultBase = {
     "inspect_pcap_capture",
     "inspect_dart_aot",
     "inspect_il2cpp_metadata",
+    "inspect_unreal_pak",
   ]),
   parent_digest: digestSchema,
   view_digest: digestSchema,
@@ -521,6 +530,13 @@ export const il2cppMetadataSummaryViewResultSchema = z.strictObject({
   summary: il2cppMetadataSummarySchema,
 });
 
+/** Footer, index facts and entry counts for selected Unreal pak delivery. */
+export const unrealPakSummaryViewResultSchema = z.strictObject({
+  ...summaryViewResultBase,
+  parent_operation: z.literal("inspect_unreal_pak"),
+  summary: unrealPakSummarySchema,
+});
+
 /** Projected facts for one selected view of retained analysis Evidence. */
 export const analysisViewResultSchema = z.discriminatedUnion("kind", [
   z.strictObject({
@@ -562,6 +578,7 @@ export const analysisViewResultSchema = z.discriminatedUnion("kind", [
       pcapSummarySchema,
       dartAotSummarySchema,
       il2cppMetadataSummarySchema,
+      unrealPakSummarySchema,
     ]),
   }),
   z.strictObject({
@@ -691,6 +708,14 @@ export const analysisViewResultSchema = z.discriminatedUnion("kind", [
     parent_operation: z.literal("inspect_il2cpp_metadata"),
   }),
   z.strictObject({
+    kind: z.literal("unreal-pak"),
+    view: unrealPakViewRequestSchema,
+    items: unrealPakViewItemsSchema,
+    ...viewResultBase,
+    ...unrealPakViewContextSchema.shape,
+    parent_operation: z.literal("inspect_unreal_pak"),
+  }),
+  z.strictObject({
     kind: z.literal("inventory"),
     view: inventoryViewSchema,
     manifest: artifactGraphManifestSchema,
@@ -799,6 +824,10 @@ export type UnsignedAnalysisView =
   | Omit<
       Extract<AnalysisViewResult, { readonly kind: "il2cpp-metadata" }>,
       "view_digest"
+    >
+  | Omit<
+      Extract<AnalysisViewResult, { readonly kind: "unreal-pak" }>,
+      "view_digest"
     >;
 
 /** Attach the content digest that must change when projected bytes change. */
@@ -846,7 +875,7 @@ const unsupportedParent = (
     parentArtifactPath(parent),
     parent.operation === "capture_browser_scenario"
       ? `Parent Evidence operation "capture_browser_scenario" supports only the environment-manifest view.`
-      : `Parent Evidence operation ${JSON.stringify(parent.operation)} does not support analysis views. Use completed binary layout, JavaScript application, native function, artifact inventory/inspection, WASM, Mach-O, Interface Builder, EVM, managed artifact or member, Android package, Dart AOT, IL2CPP metadata, or web network capture Evidence.`,
+      : `Parent Evidence operation ${JSON.stringify(parent.operation)} does not support analysis views. Use completed binary layout, JavaScript application, native function, artifact inventory/inspection, WASM, Mach-O, Interface Builder, EVM, managed artifact or member, Android package, Dart AOT, IL2CPP metadata, Unreal pak, or web network capture Evidence.`,
   );
 
 const parentArtifactPath = (parent: AnalysisViewParent): string => {
@@ -882,6 +911,7 @@ const retainedViewProjectors = new Map<string, typeof projectWasmArtifactView>([
   ["inspect_android_package", projectAndroidPackageView],
   ["inspect_dart_aot", projectDartAotView],
   ["inspect_il2cpp_metadata", projectIl2cppMetadataView],
+  ["inspect_unreal_pak", projectUnrealPakView],
   ["inspect_artifact", projectArtifactInventoryView],
   ["inventory_artifact", projectArtifactInventoryView],
 ]);
