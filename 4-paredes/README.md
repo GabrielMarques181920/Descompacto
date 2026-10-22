@@ -65,8 +65,9 @@ npm run check      # análise estática de imports/exports
 - 🎰 **Noite surpresa** — sorteia entrada, prato principal e sobremesa de uma vez.
 - ⚡ **Desafio relâmpago** — aparece do nada, vale XP extra.
 
-### Mascotes: Chispa & Fósforo
-- **Chispa** 🔥 é a faísca; **Fósforo** 🪄 é o palito. Ambos são SVG desenhado à mão, com
+### Mascotes: Chispa & Gota
+- **Chispa** é o fogo (chama antropomórfica) e **Gota** é a água (personagem-gota): um casal de
+  opostos que se provoca e se resolve. Ambos são SVG desenhado à mão, com
   7 humores (feliz, apaixonado, bravo, triste, piscada, sono, choque), piscada automática,
   língua de fogo tremulando, braços acenando e animações de pulo, flutuação e raiva.
 - Eles **conversam** em balões, **brigam entre fases** (cutscenes de diálogo no onboarding,
@@ -94,8 +95,9 @@ npm run check      # análise estática de imports/exports
   então um perfil criado antes do redesign continua renderizando ícones.
 - **Tipografia:** apenas a pilha de fontes do sistema — nenhum download de fonte, nenhuma
   requisição externa. Títulos em peso 800/900 e micro-rótulos em caixa alta com tracking largo.
-- **Mascotes:** Chispa (chama) e Fósforo (palito) redesenhados na mesma paleta, com contorno
-  dourado sutil; os 7 humores e as brigas entre fases continuam iguais.
+- **Mascotes:** Chispa (fogo) e Gota (água), um casal de opostos inspirado em adesivos de fogo e
+  água. Cada um carrega a própria paleta de personagem (laranja/vermelho e azul/ciano), enquanto
+  a interface permanece vinho/preto/branco; os 7 humores e as brigas entre fases continuam.
 - **Ícone do app:** `assets/icon.svg` — as 4 paredes em branco com a chama vinho e ouro dentro.
 
 ---

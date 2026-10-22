@@ -154,7 +154,7 @@ function nudgeLoop() {
     if (risk || Math.random() < 0.5) {
       // o mascote atravessa a tela reclamando — a chamada mais chamativa
       walkMascot(text, {
-        kind: risk ? 'chispa' : pick(['chispa', 'fosforo']),
+        kind: risk ? 'chispa' : pick(['chispa', 'gota']),
         mood: risk ? 'angry' : 'wink',
         ms: 9500,
         onClick: goTrail,

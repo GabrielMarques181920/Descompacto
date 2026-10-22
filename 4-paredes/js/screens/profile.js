@@ -83,7 +83,7 @@ function coupleCard() {
   card.append(row)
 
   const duo = el('div', { class: 'duo-stage', style: { marginTop: '14px' } })
-  duo.append(mascot('chispa', 'happy', { anim: 'idle', cls: 'pop-a' }), mascot('fosforo', 'wink', { anim: 'idle', cls: 'flip pop-b' }))
+  duo.append(mascot('chispa', 'happy', { anim: 'idle', cls: 'pop-a' }), mascot('gota', 'wink', { anim: 'idle', cls: 'flip pop-b' }))
   card.append(duo)
 
   const meet = el('button', { class: 'btn ghost sm', text: 'Ver a briga dos mascotes', style: { alignSelf: 'center', marginTop: '6px' } })

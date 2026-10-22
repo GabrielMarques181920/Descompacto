@@ -481,6 +481,26 @@ check('manifest usa o ícone novo', manifest.icons.every((i) => i.src.includes('
 check('manifest em preto/vinho', manifest.theme_color === '#0a090a' && manifest.background_color === '#0a090a')
 check('manifest standalone + pt-BR', manifest.display === 'standalone' && manifest.lang === 'pt-BR')
 
+// 8. mascotes: o casal fogo + água
+const M = await import('../js/mascots.js')
+for (const kind of ['chispa', 'gota']) {
+  const node = M.mascot(kind, 'happy', {})
+  const moods = node.querySelectorAll('.mood').length
+  check(`mascote ${kind} tem os 7 humores`, moods === 7, String(moods))
+  check(`mascote ${kind} tem corpo animável (.m-body)`, !!node.querySelector('.m-body'))
+  check(`mascote ${kind} tem braço de aceno (.m-arm-r)`, !!node.querySelector('.m-arm-r'))
+}
+check('dupla é Chispa + Gota (sem Fósforo)', !!M.VOICES.chispa && !!M.VOICES.gota && !M.VOICES.fosforo)
+const chispaSvg = M.mascot('chispa', 'happy', {}).innerHTML
+const gotaSvg = M.mascot('gota', 'happy', {}).innerHTML
+check('Chispa é fogo (gradiente quente)', chispaSvg.includes('ff9f1c') && chispaSvg.includes('e5401f'))
+check('Gota é água (gradiente frio)', gotaSvg.includes('6fd4f7') && gotaSvg.includes('1f8fd0'))
+check('Gota tem brilho + ponta animados', gotaSvg.includes('m-gloss') && gotaSvg.includes('m-drop-tip'))
+check('Chispa tem cabelo de chama animado', chispaSvg.includes('m-flame-tip'))
+const allSrc = jsFiles.map((f) => readFileSync(f, 'utf8')).join('')
+check('nenhuma referência ao mascote antigo no código', !/fosforo/i.test(allSrc))
+check('cutscenes e duelos usam a dupla nova', allSrc.includes("mascot('gota'") || allSrc.includes('mascot(\'gota\''))
+
 // 8. ícones realmente renderizados no DOM (topbar + tabbar)
 ui.renderTopbar()
 ui.renderTabbar('trilha')

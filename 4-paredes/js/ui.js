@@ -275,7 +275,7 @@ export function walkMascot(text, { kind = 'chispa', mood = 'happy', ms = 9000, o
 /** mascote quieto, só observando (aparece de vez em quando) */
 export function idleMascotPeek() {
   if (document.hidden) return
-  const kind = Math.random() < 0.5 ? 'chispa' : 'fosforo'
+  const kind = Math.random() < 0.5 ? 'chispa' : 'gota'
   const text = fillLine(pick(LINES.idle), { streak: S.streak })
   walkMascot(text, { kind, mood: 'wink', ms: 7500 })
 }
@@ -285,7 +285,7 @@ export function celebrateLevel(level) {
   confetti({ count: 40 })
   sfx.levelUp()
   const m = mascot('chispa', 'love', { anim: 'happy' })
-  const f = mascot('fosforo', 'shock', { anim: 'happy' })
+  const f = mascot('gota', 'shock', { anim: 'happy' })
   const stage = el('div', { class: 'duo-stage' }, [m, f])
   const body = el('div', { class: 'col center', style: { gap: '10px' } })
   body.append(

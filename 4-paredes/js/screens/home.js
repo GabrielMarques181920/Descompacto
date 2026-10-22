@@ -301,7 +301,7 @@ function nodeEl(day, index, unitUnlocked) {
   }
   if (state === 'current') {
     node.append(el('span', { class: 'start-bubble', text: 'hoje!' }))
-    const pet = mascot(Math.random() < 0.5 ? 'chispa' : 'fosforo', 'happy', { anim: 'idle', cls: 'm-pet' })
+    const pet = mascot(Math.random() < 0.5 ? 'chispa' : 'gota', 'happy', { anim: 'idle', cls: 'm-pet' })
     node.append(pet)
   }
   if (day.type === 'duelo' && state !== 'locked')

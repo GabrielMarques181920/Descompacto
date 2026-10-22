@@ -38,7 +38,7 @@ export function renderHub(host) {
       el('h1', { text: 'O que vocês jogam hoje?' }),
       el('p', { class: 'tiny muted', text: 'Mini-jogos liberados a qualquer hora. Valem XP, mas não contam como fase do dia.' }),
     ]),
-    mascot('fosforo', 'wink', { anim: 'wave' }),
+    mascot('gota', 'wink', { anim: 'wave' }),
   )
   wrap.append(head)
 

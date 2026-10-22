@@ -357,7 +357,7 @@ export function renderLesson(host, id) {
   /* ---------------- duelo ---------------- */
   function duel() {
     openGame('duelo', {
-      boss: node.boss ?? { left: 'chispa', right: 'fosforo', bet: 'o direito de escolher o filme' },
+      boss: node.boss ?? { left: 'chispa', right: 'gota', bet: 'o direito de escolher o filme' },
       bonusXp: Math.round(node.xp * 0.4),
       onComplete: () => finishFlow(),
     })
@@ -382,7 +382,7 @@ function fmtClock(min) {
 export function skipSheet(node, after) {
   const host = el('div', { class: 'col' })
   const sheet = openSheet(host)
-  const m = mascot('fosforo', 'sad', { anim: 'sad' })
+  const m = mascot('gota', 'sad', { anim: 'sad' })
   m.style.alignSelf = 'center'
   host.append(m)
   host.append(
@@ -427,7 +427,7 @@ export function skipSheet(node, after) {
     shake(host)
     renderTopbar()
     sheet.close()
-    toast('Adiado. O Fósforo ficou murcho.', 'warn', 2600, 'heartBroken')
+    toast('Adiado. A Gota ficou murcha.', 'warn', 2600, 'heartBroken')
     after?.()
   }
 

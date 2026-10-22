@@ -346,7 +346,7 @@ function buildQuiz(host, opts = {}) {
       phase = 'p2'
       setTimeout(() => {
         qBox.innerHTML = ''
-        const m = mascot('fosforo', 'wink', { anim: 'idle' })
+        const m = mascot('gota', 'wink', { anim: 'idle' })
         const curtain = el('div', { class: 'col center', style: { gap: '10px', padding: '10px 0' } })
         curtain.append(m, el('h3', { text: `Passa o celular para ${p2}` }), el('p', { class: 'tiny muted', text: `${p1} já respondeu. Sem espiar, hein.` }))
         const go = el('button', { class: 'btn', text: `Sou ${p2}, pode mostrar` })
@@ -528,7 +528,7 @@ function buildTimer(host, opts = {}) {
    ============================================================ */
 export function buildDuel(host, opts = {}) {
   const token = opts.token ?? {}
-  const boss = opts.boss ?? { left: 'chispa', right: 'fosforo', bet: 'o direito de escolher o filme' }
+  const boss = opts.boss ?? { left: 'chispa', right: 'gota', bet: 'o direito de escolher o filme' }
   const p1 = S.couple.p1 || 'Um'
   const p2 = S.couple.p2 || 'Outro'
   const DURATION = opts.seconds ?? 25
@@ -540,7 +540,7 @@ export function buildDuel(host, opts = {}) {
   arena.append(el('div', { class: 'floor' }))
 
   const mL = mascot(boss.left ?? 'chispa', 'angry', { anim: 'angry' })
-  const mR = mascot(boss.right ?? 'fosforo', 'angry', { anim: 'angry' })
+  const mR = mascot(boss.right ?? 'gota', 'angry', { anim: 'angry' })
   const hpL = el('div', { class: 'hp' }, [el('i', { style: { width: '100%' } })])
   const hpR = el('div', { class: 'hp' }, [el('i', { style: { width: '100%' } })])
   const fL = el('div', { class: 'fighter left' }, [hpL, mL])
@@ -606,9 +606,9 @@ export function buildDuel(host, opts = {}) {
   zR.addEventListener('pointerdown', onTapR)
 
   function sayTaunt() {
-    const kind = pick(['chispa', 'fosforo'])
-    taunt.innerHTML = `<span class="who">${kind === 'chispa' ? 'Chispa' : 'Fósforo'}</span>${pick(LINES.taunt)}`
-    taunt.className = `bubble center ${kind === 'fosforo' ? 'right' : ''}`
+    const kind = pick(['chispa', 'gota'])
+    taunt.innerHTML = `<span class="who">${kind === 'chispa' ? 'Chispa' : 'Gota'}</span>${pick(LINES.taunt)}`
+    taunt.className = `bubble center ${kind === 'gota' ? 'right' : ''}`
     taunt.style.marginTop = '10px'
   }
 
@@ -684,7 +684,7 @@ export const GAMES = {
   cartas: { em: 'cards', name: 'Baralho do Desejo', desc: 'Verdade, desafio, desejo ou curinga.', build: buildCards },
   quiz: { em: 'brain', name: 'Quem conhece quem?', desc: 'Cada um responde sobre o outro. Sintonia medida.', build: buildQuiz },
   timer: { em: 'stopwatch', name: 'Cronômetro do Toque', desc: 'Ação + tempo. Enquanto roda, vale só aquilo.', build: buildTimer },
-  duelo: { em: 'swords', name: 'Duelo dos Mascotes', desc: 'Chispa × Fósforo. Dedos na zona de toque.', build: buildDuel },
+  duelo: { em: 'swords', name: 'Duelo dos Mascotes', desc: 'Chispa × Gota. Dedos na zona de toque.', build: buildDuel },
 }
 
 const openHandles = new Set()

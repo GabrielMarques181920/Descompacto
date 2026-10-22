@@ -19,7 +19,7 @@ export function openExtraChallenge(preset) {
   function draw(fresh) {
     if (fresh) item = pick(extraPool())
     host.innerHTML = ''
-    const m = mascot(Math.random() < 0.5 ? 'chispa' : 'fosforo', 'wink', { anim: 'idle' })
+    const m = mascot(Math.random() < 0.5 ? 'chispa' : 'gota', 'wink', { anim: 'idle' })
     m.style.alignSelf = 'center'
     host.append(m)
     const card = el('div', { class: 'card center' })

@@ -45,7 +45,7 @@ export function renderOnboarding(host) {
   /* ---------- 1. idade ---------- */
   function ageGate(box) {
     const duo = el('div', { class: 'duo-stage' })
-    duo.append(mascot('chispa', 'happy', { anim: 'wave', cls: 'pop-a' }), mascot('fosforo', 'wink', { anim: 'idle', cls: 'flip pop-b' }))
+    duo.append(mascot('chispa', 'happy', { anim: 'wave', cls: 'pop-a' }), mascot('gota', 'wink', { anim: 'idle', cls: 'flip pop-b' }))
     box.append(
       el('div', { class: 'onb-hero' }, [
         el('div', { class: 'logo-mark crest', html: icon('flame', 46) }),
@@ -95,7 +95,7 @@ export function renderOnboarding(host) {
 
     const duo = el('div', { class: 'duo-stage', style: { margin: '10px 0' } })
     const m1 = mascot('chispa', 'happy', { anim: 'idle' })
-    const m2 = mascot('fosforo', 'love', { anim: 'idle', cls: 'flip' })
+    const m2 = mascot('gota', 'love', { anim: 'idle', cls: 'flip' })
     duo.append(m1, m2)
     card.append(duo)
 
@@ -259,7 +259,7 @@ export function renderOnboarding(host) {
   /* ---------- 5. pronto ---------- */
   function ready(box) {
     const duo = el('div', { class: 'duo-stage' })
-    duo.append(mascot('chispa', 'love', { anim: 'happy', cls: 'pop-a' }), mascot('fosforo', 'happy', { anim: 'happy', cls: 'flip pop-b' }))
+    duo.append(mascot('chispa', 'love', { anim: 'happy', cls: 'pop-a' }), mascot('gota', 'happy', { anim: 'happy', cls: 'flip pop-b' }))
     box.append(
       el('div', { class: 'onb-hero' }, [
         el('div', { class: 'logo-mark crest', html: icon('flame', 46) }),
@@ -279,7 +279,7 @@ export function renderOnboarding(host) {
         <strong>1 fase nova por dia.</strong> 8 temporadas, 56 fases: do reencontro ao fogo alto.<br/><br/>
         <strong>Ofensiva.</strong> Joguem todo dia para manter a chama. Perdeu um dia, ela apaga (mas dá para congelar).<br/><br/>
         <strong>Mini-jogos.</strong> Roleta, dados, baralho, quiz, cronômetro e o duelo dos mascotes — liberados a qualquer hora.<br/><br/>
-        <strong>Mascotes.</strong> Chispa e Fósforo brigam entre fases, provocam e chamam vocês de volta.
+        <strong>Mascotes.</strong> Chispa e Gota brigam entre fases, provocam e chamam vocês de volta.
       </p>`
     box.append(card)
 

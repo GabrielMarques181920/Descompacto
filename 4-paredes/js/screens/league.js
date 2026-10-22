@@ -29,7 +29,7 @@ export function renderLeague(host) {
     el('i', { style: { width: `${Math.min(100, (rank / all.length) * 100)}%` } }),
   ])
   hero.append(bar)
-  const m = mascot(rank <= 3 ? 'chispa' : 'fosforo', rank <= 3 ? 'love' : 'sad', { anim: 'idle' })
+  const m = mascot(rank <= 3 ? 'chispa' : 'gota', rank <= 3 ? 'love' : 'sad', { anim: 'idle' })
   m.style.width = '86px'
   m.style.height = '100px'
   hero.append(m)
@@ -91,7 +91,7 @@ export function renderLeague(host) {
       class: 'tiny muted',
       text: pick([
         'Dica da Chispa: fase diária + mini-jogo + relâmpago = topo da liga quase garantido.',
-        'Dica do Fósforo: os outros casais também jogam. Não confiem na sorte, confiem na rotina.',
+        'Dica da Gota: os outros casais também jogam. Não confiem na sorte, confiem na rotina.',
         'Casais no topo da liga costumam ser os mesmos que não pulam um dia sequer.',
       ]),
     }),
