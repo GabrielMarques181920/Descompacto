@@ -3,17 +3,20 @@
    ============================================================ */
 import { NODES, UNITS } from '../content.js'
 import {
+  FREE_PHASES,
   S,
   claimLightning,
   claimQuest,
   currentNodeIndex,
   dangerOfLosingStreak,
+  isPremium,
   maybeLightning,
   nextNode,
   nodeState,
   unitProgress,
   unlockedCount,
 } from '../state.js'
+import { openPaywall, paywallCard, requirePremium } from '../paywall.js'
 import { el, fmtCountdown, fmtLongDate, pick, secsToMidnight } from '../util.js'
 import { go, interval } from '../router.js'
 import { celebrateReward, nudge, renderTabbar, renderTopbar, toast } from '../ui.js'
@@ -113,6 +116,8 @@ function streakAlert() {
 function todayCard() {
   const node = nextNode()
   const idx = currentNodeIndex()
+  // amostra grátis terminou: a trilha vira vitrine do passe
+  if (!isPremium() && idx >= FREE_PHASES) return paywallCard()
   const allDoneToday = idx >= unlockedCount()
   const card = el('div', { class: 'card daily-card' })
 
@@ -274,6 +279,7 @@ function lightningCard() {
     style: { marginTop: '10px' },
   })
   btn.onclick = () => {
+    if (!requirePremium('extra')) return
     const item = maybeLightning(true)
     if (!item) return toast('Um relâmpago de cada vez. Já já aparece outro.', 'warn', 2400, 'bolt')
     sfx.alarm()
@@ -319,6 +325,14 @@ function nodeEl(day, index, unitUnlocked) {
     if (state === 'locked') {
       sfx.wrong()
       shake(node)
+      if (!isPremium()) {
+        nudge('Essa fase é do passe. A primeira vocês já jogaram de graça — o resto do ano custa menos que um lanche.', {
+          em: 'key',
+          actionLabel: 'Liberar',
+          onAction: () => openPaywall('trilha'),
+        })
+        return
+      }
       const days = Math.max(1, NODES.findIndex((n) => n.id === day.id) - unlockedCount() + 1)
       nudge(
         `Essa fase abre em ${days} ${days === 1 ? 'dia' : 'dias'}. A Chispa não deixa pular a fila de graça…`,
@@ -349,7 +363,7 @@ function footerNote() {
   const box = el('div', { class: 'card tight center', style: { marginTop: '18px' } })
   box.innerHTML = `
     <p class="tiny muted">
-      ${unlockedCount()} de ${NODES.length} fases liberadas · ${S.stats.done} concluídas<br/>
+      ${isPremium() ? `${unlockedCount()} de ${NODES.length} fases liberadas` : `Amostra grátis: ${unlockedCount()} de ${NODES.length} fases · passe ${icon('key', 12)}`} · ${S.stats.done} concluídas<br/>
       Regra das 4 paredes: o que acontece aqui, fica aqui. Consentimento sempre — usem a palavra de segurança
       (<strong>${S.prefs.safeword || 'geladeira'}</strong>) e o curinga sem culpa.
     </p>`

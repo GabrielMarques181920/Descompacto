@@ -2,7 +2,7 @@
    JOGOS — mesa de mini-jogos avulsos (jogáveis a qualquer hora)
    ============================================================ */
 import { ROULETTES } from '../content.js'
-import { S, completeActivity, maybeLightning } from '../state.js'
+import { S, completeActivity, isPremium, maybeLightning } from '../state.js'
 import { el, pick } from '../util.js'
 import { render } from '../router.js'
 import { nudge, openSheet, renderTabbar, renderTopbar, toast } from '../ui.js'
@@ -11,6 +11,7 @@ import { sfx } from '../audio.js'
 import { mascot, LINES, fillLine } from '../mascots.js'
 import { openExtraChallenge } from './extra.js'
 import { icon } from '../icons.js'
+import { paywallBanner, requirePremium } from '../paywall.js'
 
 const POOLS = {
   roleta: [
@@ -42,6 +43,9 @@ export function renderHub(host) {
   )
   wrap.append(head)
 
+  // sem passe, a mesa continua visível como vitrine — mas nada abre
+  if (!isPremium()) wrap.append(paywallBanner('jogos'))
+
   /* relâmpago */
   const item = S.lightning.today
   const light = el('div', { class: 'card tight daily-card' })
@@ -61,6 +65,7 @@ export function renderHub(host) {
     style: { marginTop: '10px' },
   })
   lightBtn.onclick = () => {
+    if (!requirePremium('extra')) return
     if (item) {
       const res = S.lightning.today
       S.lightning.today = null
@@ -85,8 +90,9 @@ export function renderHub(host) {
     const card = el('button', { class: 'game-card' })
     card.innerHTML = `<span class="g-em">${icon(g.em, 26)}</span>
       <span class="grow"><strong style="font-size:15px">${g.name}</strong><p>${g.desc}</p></span>
-      <span class="pill gold">+XP</span>`
+      ${isPremium() ? '<span class="pill gold">+XP</span>' : `<span class="pill">${icon('lock', 12)}</span>`}`
     card.onclick = () => {
+      if (!requirePremium('jogos')) return
       sfx.select()
       if (POOLS[kind]) return pickPool(kind, g)
       openGame(kind, { onComplete: () => renderTopbar(), closeOnComplete: false })
@@ -105,6 +111,7 @@ export function renderHub(host) {
     <span class="grow"><strong style="font-size:15px">Desafio extra sorteado</strong>
     <p>Um desafio avulso do baralho, respeitando o nível de intensidade de vocês.</p></span>`
   extra.onclick = () => {
+    if (!requirePremium('extra')) return
     sfx.select()
     openExtraChallenge()
   }
@@ -113,6 +120,7 @@ export function renderHub(host) {
     <span class="grow"><strong style="font-size:15px">Noite surpresa</strong>
     <p>A gente monta a noite inteira: entrada, prato principal e sobremesa.</p></span>`
   surprise.onclick = () => {
+    if (!requirePremium('jogos')) return
     sfx.select()
     openSurpriseNight()
   }

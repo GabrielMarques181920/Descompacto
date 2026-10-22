@@ -6,12 +6,14 @@ import { openSheet, toast, renderTopbar } from '../ui.js'
 import { sfx } from '../audio.js'
 import { confetti, floatHearts } from '../fx.js'
 import { mascot } from '../mascots.js'
+import { requirePremium } from '../paywall.js'
 
 export function extraPool() {
   return EXTRA.filter((e) => (e.level ?? 1) <= S.prefs.intensity)
 }
 
 export function openExtraChallenge(preset) {
+  if (!requirePremium('extra')) return null
   const host = el('div', { class: 'col' })
   const sheet = openSheet(host)
   let item = preset ?? pick(extraPool())

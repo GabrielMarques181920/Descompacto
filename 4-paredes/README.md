@@ -49,13 +49,51 @@ Como a página funciona:
   se escolheram?*
 - **Prova em movimento** — Chispa & Gota aparecem no herói e no fechamento, e um ticker rola com
   títulos **reais** tirados de `js/content.js` (nada de texto inventado).
-- **Oferta** — 7 dias grátis e depois **R$ 19,90/mês** (preço confirmado, também no FAQ).
+- **Oferta** — a **1ª fase é grátis** (sem cartão) e depois **R$ 19,90/mês** (card + FAQ).
   Os 3 depoimentos seguem **placeholder** (`<!-- SUBSTITUA -->`) até existirem casais reais.
-- **Teste grátis de verdade** — chegar com `?trial=1` grava `S.trialStart` (`state.js`) e o jogo
-  avisa "Teste grátis de 7 dias ativado"; `trialInfo()` diz o dia (1..7) e quantos faltam.
-  Ainda não há cobrança nem bloqueio: quando você definir preço e duração, o paywall entra aqui.
+- **Amostra grátis = 1 fase** — chegar com `?trial=1` grava `S.trialStart` (`state.js`) e o jogo
+  avisa que a primeira fase está liberada. `trialInfo()` diz há quantos dias o lead chegou.
 - Mesma identidade do jogo: vinho/preto/branco, dourado só em recompensa e no CTA da oferta,
   fonte do sistema, zero emoji, zero CDN.
+
+---
+
+## Paywall: só a 1ª fase é grátis (`js/paywall.js`)
+
+Regra do funil: **o lead joga a fase 1 de graça e, a partir da segunda, precisa pagar**.
+
+| Situação | O que acontece |
+| --- | --- |
+| Sem passe | `unlockedCount()` devolve `FREE_PHASES` (= 1). O modo maratona **não** fura o paywall. |
+| Trilha | Fase 1 jogável; as outras 55 aparecem com cadeado. Ao concluir a 1ª, o cartão de hoje vira o **cartão do passe** (`paywallCard`). |
+| Tocar numa fase bloqueada | Nudge da Chispa + modal de pagamento (`openPaywall`), nunca o "abre em X dias". |
+| Link direto `#/fase/u1d3` | `renderLesson` barra, volta para a trilha e abre o pagamento. |
+| Aba Jogos | Continua visível como **vitrine**: faixa do passe (`paywallBanner`), cadeado nos cards e qualquer toque abre o pagamento. |
+| Aba Liga | `paywallPanel` no lugar da tabela. |
+| Extras, relâmpago, noite surpresa | `requirePremium()` em cada clique. |
+
+**Cobrança** (o app é 100% estático, então o pagamento acontece fora):
+
+```js
+// js/paywall.js
+export const PAY = {
+  price: 'R$ 19,90',
+  period: '/mês',
+  checkoutUrl: '',            // ← COLE AQUI o link (Stripe, Mercado Pago, Hotmart, Kiwify…)
+  codes: ['4PAREDES-CHAMA'],  // liberação manual depois de confirmar o pagamento
+  paidParam: 'paid',          // volta do checkout: app.html?paid=1
+  codeParam: 'code',          // ou: app.html?code=XXXX
+}
+```
+
+- Com `checkoutUrl` preenchido, o CTA "Pagar e liberar tudo" abre o checkout em outra aba e o
+  app orienta o lead a voltar e tocar em **"Já paguei"**.
+- Duas formas de liberar: **volta do checkout** (`?paid=1` ou `?code=XXXX`, que o `checkUnlockFromUrl()`
+  lê no boot) ou **código de acesso** digitado no modal (`validateCode()`).
+- Pagou → `markPaid()` grava `S.paid`, `S.paidAt` e `S.payCode`; a trilha, os jogos, o diário e a
+  liga abrem na hora, com confete. **Sem backend**: a confirmação real do pagamento depende do
+  redirect do seu provedor ou do código que você enviar.
+- Preços, textos e o que entra no passe ficam em `PAY`/`INCLUDED` — nada está espalhado pelas telas.
 
 ---
 

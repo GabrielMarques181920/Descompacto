@@ -4,7 +4,8 @@
 import { LINES, SCENES, fillLine, playCutscene } from './mascots.js'
 import { parseRoute, paint, setRenderer } from './router.js'
 import { hideChrome, idleMascotPeek, nudge, renderTabbar, renderTopbar, toast, walkMascot } from './ui.js'
-import { S, dangerOfLosingStreak, save, syncDay, trialInfo, unlockedCount } from './state.js'
+import { S, dangerOfLosingStreak, isPremium, save, syncDay, unlockedCount } from './state.js'
+import { checkUnlockFromUrl } from './paywall.js'
 import { setSound, sfx } from './audio.js'
 import { initNotifications, maybeStreakAlert, scheduleDaily } from './notify.js'
 import { pick, qs, todayKey } from './util.js'
@@ -89,6 +90,7 @@ function boot() {
   setTimeout(() => boot?.remove(), 1200)
 
   applyTrial()
+  checkUnlockFromUrl()
 
   if (!S.onboarded) return
 
@@ -137,13 +139,14 @@ function applyTrial() {
   S.trialStart = S.trialStart || todayKey()
   save()
   history.replaceState(null, '', location.pathname + location.hash)
-  const info = trialInfo()
   setTimeout(
     () =>
       toast(
-        fresh
-          ? 'Teste grátis de 7 dias ativado. Tudo liberado — a primeira fase já espera por vocês.'
-          : `Teste grátis: dia ${info.day} de 7. Faltam ${info.left} dia(s) de tudo liberado.`,
+        isPremium()
+          ? 'Passe ativo: as 56 fases são de vocês. Bom jogo.'
+          : fresh
+            ? 'Primeira fase liberada, sem cartão. Joguem hoje — depois dela o jogo pede o passe.'
+            : `A fase ${unlockedCount()} espera por vocês. Depois dela, o passe libera o resto do ano.`,
         'hot',
         fresh ? 4800 : 3800,
         'gift',

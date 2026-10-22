@@ -41,6 +41,9 @@ function defaultState() {
     onboarded: false,
     startDate: today,
     trialStart: null, // vindo da página de vendas (?trial=1)
+    paid: false, // passe comprado: libera tudo depois da 1ª fase
+    paidAt: null,
+    payCode: null,
     couple: { p1: 'Você', p2: 'Amor', emoji: 'couple', since: '' },
     prefs: {
       intensity: 2,
@@ -110,8 +113,8 @@ export function save() {
   saveJSON(KEY, S)
 }
 
-/* ---------------- teste grátis (7 dias, vindo da página de vendas) ---------------- */
-export const TRIAL_DAYS = 7
+/* ---------------- chegada do lead (vindo da página de vendas) ---------------- */
+export const TRIAL_DAYS = 7 // janela em que o lead chegou pela página de vendas (não é mais o período grátis: a amostra é a 1ª fase)
 
 /** dia atual do teste (1..7) e quantos faltam; active=false quando não há teste */
 export function trialInfo(now = todayKey()) {
@@ -147,8 +150,28 @@ export function levelInfo(xp = S.xp) {
   return { level, into: rest, need, pct: clamp(rest / need, 0, 1) }
 }
 
+/* ---------------- passe pago: só a 1ª fase é grátis ---------------- */
+export const FREE_PHASES = 1
+
+/** o lead pagou? sem passe, o jogo inteiro cabe em FREE_PHASES */
+export function isPremium() {
+  return S.paid === true
+}
+
+/** confirma o pagamento (volta do checkout ou por código de acesso) */
+export function markPaid(code = '') {
+  S.paid = true
+  S.paidAt = todayKey()
+  S.payCode = code || null
+  save()
+  emit('paid')
+  return { paid: true, at: S.paidAt }
+}
+
 /* ---------------- desbloqueio de fases ---------------- */
 export function unlockedCount() {
+  // sem passe, a trilha termina na primeira fase — o resto é paywall
+  if (!isPremium()) return Math.min(FREE_PHASES, NODES.length)
   if (S.prefs.marathon) return NODES.length
   const days = Math.max(0, daysBetween(todayKey(), S.startDate))
   return clamp(days + 1, 1, NODES.length)

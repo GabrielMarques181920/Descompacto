@@ -2,18 +2,25 @@
    LIGA — competição semanal entre casais (simulada)
    ============================================================ */
 import { LEAGUES } from '../content.js'
-import { S, leagueTier, standings } from '../state.js'
+import { S, isPremium, leagueTier, standings } from '../state.js'
 import { el, pick } from '../util.js'
 import { renderTabbar, toast } from '../ui.js'
 import { render as rerender } from '../router.js'
 import { mascot } from '../mascots.js'
 import { sfx } from '../audio.js'
 import { icon } from '../icons.js'
+import { paywallPanel } from '../paywall.js'
 
 export function renderLeague(host) {
   renderTabbar('liga')
   const wrap = el('div', { class: 'col stagger' })
   host.append(wrap)
+
+  // liga é conteúdo pago: sem passe, mostra a vitrine do passe
+  if (!isPremium()) {
+    wrap.append(paywallPanel('liga'))
+    return
+  }
 
   const tier = leagueTier()
   const { all, rank } = standings()

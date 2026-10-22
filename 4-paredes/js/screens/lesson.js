@@ -2,7 +2,8 @@
    FASE — tela do desafio do dia (estilo lição do Duolingo)
    ============================================================ */
 import { NODES, nodeById } from '../content.js'
-import { S, completeNode, nodeText, openChest, skipNode, spendBrasas, unlockedCount } from '../state.js'
+import { FREE_PHASES, S, completeNode, isPremium, nodeText, openChest, skipNode, spendBrasas, unlockedCount } from '../state.js'
+import { openPaywall } from '../paywall.js'
 import { clamp, el, pick, qs } from '../util.js'
 import { go, interval, onLeave } from '../router.js'
 import { celebrateLevel, celebrateReward, openSheet, renderTopbar, toast } from '../ui.js'
@@ -24,6 +25,13 @@ const CHECKLIST = [
 export function renderLesson(host, id) {
   const node = nodeById(id)
   if (!node) return go('#/trilha')
+
+  // fase além da amostra grátis → paywall (não deixa entrar nem por link direto)
+  if (!isPremium() && NODES.findIndex((n) => n.id === node.id) >= FREE_PHASES) {
+    go('#/trilha')
+    openPaywall('fase')
+    return
+  }
   const tabbar = qs('#tabbar')
   tabbar.hidden = true
   onLeave(() => {
@@ -275,18 +283,33 @@ export function renderLesson(host, id) {
     hostBox.append(m)
     const nextIdx = NODES.indexOf(node) + 1
     const next = NODES[nextIdx]
-    const info = next
-      ? nextIdx >= unlockedCount()
-        ? 'A próxima fase abre amanhã à meia-noite. A Chispa vai lembrar vocês.'
-        : `A próxima fase já está liberada: ${icon(next.em, 17)} ${next.title}`
-      : 'Vocês terminaram todas as temporadas. A casa é oficialmente um vulcão.'
-    hostBox.append(el('h2', { text: 'Dia vencido!' }), el('p', { class: 'muted tiny', html: info }))
+    const paywalled = !isPremium() && nextIdx >= FREE_PHASES
+    const info = paywalled
+      ? `A fase ${nextIdx + 1} (${next ? next.title : 'a próxima'}) e as outras ${NODES.length - FREE_PHASES} estão do outro lado do passe.`
+      : next
+        ? nextIdx >= unlockedCount()
+          ? 'A próxima fase abre amanhã à meia-noite. A Chispa vai lembrar vocês.'
+          : `A próxima fase já está liberada: ${icon(next.em, 17)} ${next.title}`
+        : 'Vocês terminaram todas as temporadas. A casa é oficialmente um vulcão.'
+    hostBox.append(
+      el('h2', { text: paywalled ? 'Amostra grátis concluída!' : 'Dia vencido!' }),
+      el('p', { class: 'muted tiny', html: info }),
+    )
     const row = el('div', { class: 'col', style: { gap: '8px', width: '100%' } })
-    const home = el('button', { class: 'btn', text: 'Voltar à trilha' })
-    home.onclick = () => go('#/trilha')
-    const extra = el('button', { class: 'btn ghost', text: 'Desafio extra' })
-    extra.onclick = () => openExtraChallenge()
-    row.append(home, extra)
+    if (paywalled) {
+      const buy = el('button', { class: 'btn gold' })
+      buy.innerHTML = `<span class="shine"></span>${icon('key', 17)} Liberar as ${NODES.length} fases`
+      buy.onclick = () => openPaywall('fase')
+      const home = el('button', { class: 'btn ghost', text: 'Voltar à trilha' })
+      home.onclick = () => go('#/trilha')
+      row.append(buy, home)
+    } else {
+      const home = el('button', { class: 'btn', text: 'Voltar à trilha' })
+      home.onclick = () => go('#/trilha')
+      const extra = el('button', { class: 'btn ghost', text: 'Desafio extra' })
+      extra.onclick = () => openExtraChallenge()
+      row.append(home, extra)
+    }
     hostBox.append(row)
     view.innerHTML = ''
     view.append(hostBox)

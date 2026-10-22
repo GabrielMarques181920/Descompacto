@@ -765,11 +765,12 @@ main {
   gap: 16px;
 }
 .offer-head b {
-  font-size: 64px;
+  font-size: clamp(38px, 10vw, 58px);
   font-weight: 900;
   letter-spacing: -0.04em;
   color: var(--paper);
   line-height: 1;
+  white-space: nowrap;
 }
 .offer-head span {
   text-align: left;

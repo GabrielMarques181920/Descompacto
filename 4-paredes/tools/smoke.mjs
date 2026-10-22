@@ -130,6 +130,10 @@ check('passo 5 (pronto)', $('#screen').textContent.includes('Tudo pronto'))
 click($$('#screen .btn').find((b) => b.textContent.includes('direto para a trilha')))
 await wait(80)
 
+/* o restante do smoke exercita o jogo completo: libera o passe.
+   (a amostra grátis de 1 fase e o paywall são testados na seção 14) */
+state.markPaid('SMOKE')
+
 /* ---------- 2. trilha ---------- */
 console.log('\n2) Trilha')
 check('estado onboarded', state.S.onboarded === true)
@@ -535,7 +539,10 @@ check('links internos são âncoras da própria página', ctas.filter((h) => !h.
 check('headline fala de rotina + 365 dias', /rotina/i.test(landingHtml) && /365/.test(landingHtml))
 check('copy tem a seção de consciência', landingHtml.includes('A rotina não chega com uma briga'))
 check('copy tem a pergunta que incomoda', /se escolheram/i.test(landingHtml))
-check('oferta de 7 dias grátis presente', /7 dias/i.test(landingHtml) && landingHtml.includes('offer-card'))
+check('oferta: 1ª fase grátis no card', landingHtml.includes('offer-card') && /1ª fase/.test(landingHtml))
+check('landing não promete mais 7 dias grátis', !/7 dias grátis/i.test(landingHtml))
+check('landing diz que a 1ª fase não pede cartão', /Sem cartão na primeira fase/i.test(landingHtml) && /não pede cartão/i.test(landingHtml))
+check('CTAs dizem "primeira fase grátis"', (landingHtml.match(/primeira fase grátis/gi) || []).length >= 3)
 check('micro-trust: sem cartão, sem spam, sigilo', /Sem cartão/i.test(landingHtml) && /Sem spam/i.test(landingHtml))
 check('marcação 18+', /\+18|18 anos/.test(landingHtml))
 check('preço real definido (R$ 19,90/mês)', landingHtml.includes('R$ 19,90/mês') && !/AJUSTE O PREÇO/.test(landingHtml))
@@ -569,6 +576,113 @@ check('state tem trialStart + trialInfo', readFileSync(join(root, 'js/state.js')
 check('main.js ativa o teste com ?trial=1', readFileSync(join(root, 'js/main.js'), 'utf8').includes("get('trial') !== '1'"))
 check('manifest abre o jogo (não a landing)', manifest.start_url === './app.html')
 check('shortcuts do manifest abrem o jogo', manifest.shortcuts.every((sc) => sc.url.startsWith('./app.html')))
+
+/* ---------- 14. paywall: só a 1ª fase é grátis ---------- */
+console.log('\n14) Paywall (1 fase grátis → pagamento)')
+const paywallSrc = readFileSync(join(root, 'js/paywall.js'), 'utf8')
+const PAY = await import('../js/paywall.js')
+
+check('FREE_PHASES é 1', state.FREE_PHASES === 1, String(state.FREE_PHASES))
+check('estado tem paid/paidAt/payCode', 'paid' in state.S && 'paidAt' in state.S && 'payCode' in state.S)
+
+// volta para o estado de lead sem passe
+state.S.paid = false
+state.S.payCode = null
+state.save()
+check('lead sem passe não é premium', state.isPremium() === false)
+check('trilha libera só 1 fase sem passe', state.unlockedCount() === 1, String(state.unlockedCount()))
+check('fase 2 nasce bloqueada sem passe', state.nodeState(NODES[1].id) === 'locked', state.nodeState(NODES[1].id))
+check('maratonas não furam o paywall', (state.S.prefs.marathon = true, state.unlockedCount() === 1))
+state.S.prefs.marathon = false
+
+// configuração de cobrança
+check('preço do passe é R$ 19,90/mês', PAY.PAY.price === 'R$ 19,90' && PAY.PAY.period === '/mês')
+check('checkout configurável (URL + params de volta)', 'checkoutUrl' in PAY.PAY && PAY.PAY.paidParam === 'paid' && PAY.PAY.codeParam === 'code')
+check('código de acesso manual existe', Array.isArray(PAY.PAY.codes) && PAY.PAY.codes.length >= 1)
+check('validateCode aceita o código e rejeita lixo', PAY.validateCode('4paredes-chama') === true && PAY.validateCode('qualquer') === false && PAY.validateCode('') === false)
+check('requirePremium barra sem passe', PAY.requirePremium('teste') === false)
+check('paywall abriu no DOM', !!window.document.querySelector('.pay-price, .pay-card, .pay-panel'))
+check('modal do paywall tem preço e CTA', window.document.querySelector('#modal-layer .pay-price')?.textContent.includes('19,90') === true)
+check('modal lista o que o passe libera', window.document.querySelectorAll('#modal-layer .pay-list li').length >= 5)
+check('modal tem entrada de código de acesso', !!window.document.querySelector('#modal-layer .pay-code'))
+
+// pagamento por código libera tudo
+const codeInput = window.document.querySelector('#modal-layer .pay-code .input')
+window.document.querySelector('#modal-layer .pay-cta')?.click?.()
+const input2 = window.document.querySelector('#modal-layer .pay-code .input') ?? codeInput
+if (input2) {
+  input2.value = '4PAREDES-CHAMA'
+  const liberar = [...window.document.querySelectorAll('#modal-layer .pay-code .btn')].find((b) => b.textContent.includes('Liberar'))
+  liberar?.click()
+  await wait(60)
+}
+check('pagar libera o passe', state.isPremium() === true)
+check('passe registra data e código', !!state.S.paidAt && !!state.S.payCode)
+// com o passe, o limite deixa de ser o paywall (volta a ser a cadência diária:
+// 1 fase por dia, ou a temporada inteira no modo maratona)
+state.S.prefs.marathon = true
+check('passe reabre a trilha inteira (maratona)', state.unlockedCount() === NODES.length, String(state.unlockedCount()))
+check('fase 2 jogável depois do pagamento', state.nodeState(NODES[1].id) !== 'locked', state.nodeState(NODES[1].id))
+state.S.prefs.marathon = false
+check('sem maratona, o passe segue a cadência de 1 fase/dia', state.unlockedCount() === 1, String(state.unlockedCount()))
+
+// fluxo real sem passe: trilha vira vitrine, abas pagas mostram o painel
+state.S.paid = false
+state.S.payCode = null
+state.save()
+const showRoute = async (hash) => {
+  window.location.hash = hash
+  router.render() // hash igual não dispara hashchange no jsdom
+  await wait(90)
+}
+await showRoute('#/trilha')
+check('trilha sem passe mostra o cartão do passe', !!$('#screen .pay-card'), $('#screen').textContent.slice(0, 40))
+check('cartão da trilha diz o preço', /19,90/.test($('#screen .pay-card')?.textContent ?? ''))
+const payCta = $('#screen .pay-card .btn')
+check('cartão do passe tem CTA', !!payCta)
+click(payCta)
+await wait(60)
+check('CTA da trilha abre o modal de pagamento', !!$('#modal-layer .pay-price'))
+await showRoute('#/jogos')
+check('aba Jogos mostra a faixa do passe', !!$('#screen .pay-banner'), $('#screen').textContent.slice(0, 40))
+check('jogos ficam com cadeado na vitrine', $$('#screen .game-card .pill').some((x) => x.querySelector('svg')))
+click($('#screen .game-card'))
+await wait(60)
+check('tocar num jogo sem passe abre o pagamento', !!$('#modal-layer .pay-price'))
+$('#modal-layer').hidden = true
+await showRoute('#/liga')
+check('aba Liga bloqueada sem passe', !!$('#screen .pay-panel'))
+await showRoute('#/trilha')
+const lockedNode = $$('.node.locked')[0]
+check('existem fases bloqueadas sem passe', !!lockedNode)
+click(lockedNode)
+await wait(40)
+check('fase bloqueada sem passe chama o paywall (não o "abre em X dias")', /passe/i.test($('#nudge-layer')?.textContent ?? '') || !!$('#modal-layer .pay-price'))
+state.markPaid('SMOKE')
+
+// vitrines do passe
+const card = PAY.paywallCard()
+check('cartão do passe na trilha existe', card.className.includes('pay-card') && /19,90/.test(card.textContent))
+const panel = PAY.paywallPanel('liga')
+check('painel de aba bloqueada existe', panel.className.includes('pay-panel') && /passe/.test(panel.textContent))
+
+// gates ligados em todas as portas de conteúdo pago
+const gateMap = {
+  'js/screens/home.js': ['paywallCard', 'openPaywall', 'requirePremium'],
+  'js/screens/hub.js': ['requirePremium'],
+  'js/screens/league.js': ['isPremium', 'paywallPanel'],
+  'js/screens/extra.js': ['requirePremium'],
+  'js/screens/lesson.js': ['openPaywall', 'FREE_PHASES'],
+  'js/main.js': ['checkUnlockFromUrl'],
+}
+for (const [file, needles] of Object.entries(gateMap)) {
+  const src = readFileSync(join(root, file), 'utf8')
+  check(`gate em ${file.replace('js/screens/', '').replace('js/', '')}`, needles.every((n) => src.includes(n)), needles.filter((n) => !src.includes(n)).join(','))
+}
+check('paywall tem CSS próprio', ['pay-card', 'pay-panel', 'pay-price', 'pay-list', 'pay-code'].every((c) => screensCss.includes(`.${c}`)))
+check('paywall não usa emoji', !EMOJI_RE.test(paywallSrc))
+check('paywall não usa cores banidas', !BANNED.some((c) => paywallSrc.toLowerCase().includes(c)))
+check('volta do checkout desbloqueia (?paid=1 / ?code=)', paywallSrc.includes('checkUnlockFromUrl') && paywallSrc.includes('paidParam'))
 
 console.log(`\n${'='.repeat(46)}`)
 console.log(`erros capturados: ${errors.length}`)
