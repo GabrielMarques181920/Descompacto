@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
-const html = readFileSync(join(root, 'index.html'), 'utf8')
+const html = readFileSync(join(root, 'app.html'), 'utf8')
 
 const dom = new JSDOM(html, {
   url: 'http://localhost:4321/#/trilha',
@@ -367,9 +367,10 @@ check('temas cobrem os pedidos do brief', C.NODES.some((n) => /50 Tons/i.test(n.
 
 /* ---------- 11. sanidade de CSS/DOM (jsdom não aplica CSS) ---------- */
 console.log('\n11) Sanidade de CSS/DOM')
-const appCss = readFileSync(join(root, 'styles/app.css'), 'utf8')
+const mascotsCss = readFileSync(join(root, 'styles/mascots.css'), 'utf8')
+const appCss = readFileSync(join(root, 'styles/app.css'), 'utf8') + '\n' + mascotsCss
 const screensCss = readFileSync(join(root, 'styles/screens.css'), 'utf8')
-const indexHtml = readFileSync(join(root, 'index.html'), 'utf8')
+const appHtml = readFileSync(join(root, 'app.html'), 'utf8')
 
 // bug real: .modal-layer tem display:grid + backdrop-filter:blur e usava o
 // atributo hidden — sem a regra global, a camada de blur cobria o app inteiro.
@@ -377,11 +378,11 @@ check('regra global [hidden] existe', /\[hidden\]\s*\{[^}]*display:\s*none\s*!im
 const toggled = ['topbar', 'tabbar', 'modal-layer', 'nudge-layer']
 for (const id of toggled) {
   const re = new RegExp(`id="${id}"[^>]*hidden`)
-  check(`#${id} nasce hidden no HTML`, re.test(indexHtml))
+  check(`#${id} nasce hidden no HTML`, re.test(appHtml))
 }
 check('modal-layer é a camada com blur', /\.modal-layer\s*\{[^}]*backdrop-filter/.test(appCss))
-check('boot tem rede de segurança (failsafe de 6s)', indexHtml.includes('6000') && indexHtml.includes("classList.contains('off')"))
-check('boot reporta erro em vez de travar', indexHtml.includes("addEventListener('error'"))
+check('boot tem rede de segurança (failsafe de 6s)', appHtml.includes('6000') && appHtml.includes("classList.contains('off')"))
+check('boot reporta erro em vez de travar', appHtml.includes("addEventListener('error'"))
 check('camadas de fx/modal não bloqueiam toque indevidamente', /\.fx-layer\s*\{[^}]*pointer-events:\s*none/.test(appCss))
 
 // ordem de empilhamento: fundo < app < mascote < fx < modal < nudge < toast < boot
@@ -465,8 +466,9 @@ for (const token of ['--wine-500', '--wine-900', '--gold', '--paper', '--black']
 // 6. tipografia do sistema (sem download de fonte)
 const allCss = appCss + screensCss
 check('sem @font-face', !/@font-face/.test(allCss))
-check('sem @import de fonte', !/@import\s+url/.test(allCss))
-check('sem CDN de fonte no HTML', !/fonts\.(googleapis|gstatic)/.test(indexHtml))
+check('sem @import de fonte', !/@import[^;]*fonts\.|@import[^;]*\.(woff|ttf|otf)/.test(allCss))
+check('@import só de CSS local', [...allCss.matchAll(/@import\s+url\(\s*'([^']+)'/g)].every((m) => m[1].startsWith('./') && m[1].endsWith('.css')))
+check('sem CDN de fonte no HTML', !/fonts\.(googleapis|gstatic)/.test(appHtml))
 check('stack de fonte do sistema', /--font:[^;]*-apple-system/.test(appCss))
 
 // 7. marca: splash, ícone do app e manifest
@@ -474,8 +476,8 @@ const iconPath = join(root, 'assets/icon.svg')
 check('assets/icon.svg existe', existsSync(iconPath))
 const iconSvg = existsSync(iconPath) ? readFileSync(iconPath, 'utf8') : ''
 check('ícone do app usa a paleta vinho', /#3b0c18|#8c1c39/.test(iconSvg) && /#c9a227|#e6cd84/.test(iconSvg))
-check('HTML aponta para assets/icon.svg', indexHtml.includes('./assets/icon.svg'))
-check('splash tem crest + wordmark', indexHtml.includes('boot-crest') && indexHtml.includes('boot-word'))
+check('HTML aponta para assets/icon.svg', appHtml.includes('./assets/icon.svg'))
+check('splash tem crest + wordmark', appHtml.includes('boot-crest') && appHtml.includes('boot-word'))
 const manifest = JSON.parse(readFileSync(join(root, 'manifest.webmanifest'), 'utf8'))
 check('manifest usa o ícone novo', manifest.icons.every((i) => i.src.includes('assets/icon.svg')))
 check('manifest em preto/vinho', manifest.theme_color === '#0a090a' && manifest.background_color === '#0a090a')
@@ -508,6 +510,63 @@ const domIcons = window.document.querySelectorAll('#topbar svg.ic, #tabbar svg.i
 check('topbar/tabbar renderizam SVG (não emoji)', domIcons.length >= 7, String(domIcons.length))
 check('tabbar tem 4 ícones', window.document.querySelectorAll('#tabbar svg.ic').length === 4)
 check('chips do topbar usam ícone', window.document.querySelectorAll('#topbar .chip svg.ic').length === 3)
+
+/* ---------- 13. página de vendas (front door antes do teste grátis) ---------- */
+console.log('\n13) Página de vendas')
+const landingHtml = readFileSync(join(root, 'index.html'), 'utf8')
+const landingCss = readFileSync(join(root, 'styles/landing.css'), 'utf8')
+const landingJs = readFileSync(join(root, 'js/landing.js'), 'utf8')
+
+// a casca do jogo saiu de index.html; a landing não pode fingir ser o jogo
+check('index.html é a página de vendas (não a casca do jogo)', !landingHtml.includes('id="screen"') && !landingHtml.includes('id="topbar"'))
+check('app.html é a casca do jogo', appHtml.includes('id="screen"') && appHtml.includes('id="tabbar"'))
+check('server.mjs serve index.html em /', readFileSync(join(root, 'server.mjs'), 'utf8').includes("'/index.html'"))
+check('landing carrega seu próprio CSS/JS', landingHtml.includes('./styles/landing.css') && landingHtml.includes('./js/landing.js'))
+check('CSS/JS da landing existem', landingCss.length > 4000 && landingJs.length > 800)
+
+// todo CTA leva para o teste grátis do jogo
+const ctas = [...landingHtml.matchAll(/href="([^"]+)"/g)].map((m) => m[1])
+const appLinks = ctas.filter((h) => h.includes('app.html'))
+check('CTAs apontam para app.html?trial=1', appLinks.length >= 5 && appLinks.every((h) => h === './app.html?trial=1'), appLinks.join(','))
+check('nenhum CTA morto (# vazio)', !ctas.some((h) => h === '#' || h === ''))
+check('links internos são âncoras da própria página', ctas.filter((h) => !h.includes('app.html')).every((h) => h.startsWith('#') || h.startsWith('./')))
+
+// copy: headline, consciência, oferta, confiança
+check('headline fala de rotina + 365 dias', /rotina/i.test(landingHtml) && /365/.test(landingHtml))
+check('copy tem a seção de consciência', landingHtml.includes('A rotina não chega com uma briga'))
+check('copy tem a pergunta que incomoda', /se escolheram/i.test(landingHtml))
+check('oferta de 7 dias grátis presente', /7 dias/i.test(landingHtml) && landingHtml.includes('offer-card'))
+check('micro-trust: sem cartão, sem spam, sigilo', /Sem cartão/i.test(landingHtml) && /Sem spam/i.test(landingHtml))
+check('marcação 18+', /\+18|18 anos/.test(landingHtml))
+check('preço e depoimentos marcados como placeholder', /AJUSTE O PREÇO/.test(landingHtml) && /SUBSTITUA/.test(landingHtml))
+
+// hooks que o JS da landing precisa
+for (const hook of ['hero-duo', 'final-duo', 'ticker', 'year']) {
+  check(`landing tem #${hook}`, landingHtml.includes(`id="${hook}"`))
+}
+check('landing tem ícones declarativos', (landingHtml.match(/data-icon="/g) || []).length >= 20)
+check('landing tem contadores animados', (landingHtml.match(/data-count="/g) || []).length >= 4)
+const hookIcons = [...landingHtml.matchAll(/data-icon="([A-Za-z0-9]+)"/g)].map((m) => m[1]).filter((n) => !ICONS[n])
+check('todos os data-icon da landing existem', hookIcons.length === 0, hookIcons.join(','))
+check('landing.js usa a dupla e o conteúdo real', landingJs.includes("mascot('gota'") && landingJs.includes("mascot('chispa'") && /from '\.\/content\.js'/.test(landingJs))
+check('ticker monta com títulos reais (sem inventar)', landingJs.includes('iconNameFor') && landingJs.includes('title'))
+
+// identidade: mesma paleta, sem emoji, sem CDN, sem cores banidas
+const landingAll = (landingHtml + landingCss + landingJs).toLowerCase()
+check('landing sem emoji do sistema', !EMOJI_RE.test(landingHtml + landingJs))
+check('landing sem CDN de fonte', !/fonts\.(googleapis|gstatic)/.test(landingHtml) && !/@font-face/.test(landingCss))
+check('landing sem cores neon banidas', !BANNED.some((c) => landingAll.includes(c)))
+check('landing usa a paleta vinho/preto/branco', landingCss.includes('--wine-500') && landingCss.includes('#0a090a') && landingCss.includes('--paper'))
+check('landing importa o CSS dos mascotes', landingCss.includes("@import url('./mascots.css')"))
+check('app.css também importa os mascotes (fonte única)', appCss.includes("@import url('./mascots.css')"))
+check('mascots.css tem os 7 humores', ['love', 'angry', 'sad', 'happy', 'wink', 'sleepy', 'shock'].every((m) => mascotsCss.includes(`[data-mood="${m}"]`)))
+check('landing respeita prefers-reduced-motion', /prefers-reduced-motion/.test(landingCss))
+
+// teste grátis do outro lado do CTA
+check('state tem trialStart + trialInfo', readFileSync(join(root, 'js/state.js'), 'utf8').includes('trialStart') && readFileSync(join(root, 'js/state.js'), 'utf8').includes('export function trialInfo'))
+check('main.js ativa o teste com ?trial=1', readFileSync(join(root, 'js/main.js'), 'utf8').includes("get('trial') !== '1'"))
+check('manifest abre o jogo (não a landing)', manifest.start_url === './app.html')
+check('shortcuts do manifest abrem o jogo', manifest.shortcuts.every((sc) => sc.url.startsWith('./app.html')))
 
 console.log(`\n${'='.repeat(46)}`)
 console.log(`erros capturados: ${errors.length}`)

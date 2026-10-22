@@ -29,6 +29,36 @@ npm run check      # análise estática de imports/exports
 
 ---
 
+## Página de vendas (`/`)
+
+A porta de entrada não é o jogo: é a página de vendas (`index.html`), que só então libera o
+teste grátis. O jogo mora em **`/app.html`**.
+
+```
+/                → página de vendas (index.html + styles/landing.css + js/landing.js)
+/app.html        → o jogo (casca, topbar, trilha, tabs)
+/app.html?trial=1→ todos os CTAs da página de vendas caem aqui
+```
+
+Como a página funciona:
+
+- **Copy de consciência** — a headline ("Não deixe seu relacionamento cair na rotina. /
+  365 dias. 365 formas de manter a chama acesa.") abre para três incômodos ("A rotina não chega
+  com uma briga…", "tem uma tela entre vocês há quantas noites?", "Rotina não é falta de amor.
+  É falta de plano.") e para a pergunta que fecha a seção: *quando foi a última vez que vocês
+  se escolheram?*
+- **Prova em movimento** — Chispa & Gota aparecem no herói e no fechamento, e um ticker rola com
+  títulos **reais** tirados de `js/content.js` (nada de texto inventado).
+- **Oferta** — card de 7 dias grátis com preço e depoimentos **marcados como placeholder**
+  (`<!-- SUBSTITUA -->`, `<!-- AJUSTE O PREÇO -->`) para você trocar pelos reais.
+- **Teste grátis de verdade** — chegar com `?trial=1` grava `S.trialStart` (`state.js`) e o jogo
+  avisa "Teste grátis de 7 dias ativado"; `trialInfo()` diz o dia (1..7) e quantos faltam.
+  Ainda não há cobrança nem bloqueio: quando você definir preço e duração, o paywall entra aqui.
+- Mesma identidade do jogo: vinho/preto/branco, dourado só em recompensa e no CTA da oferta,
+  fonte do sistema, zero emoji, zero CDN.
+
+---
+
 ## O jogo
 
 ### Trilha diária (o coração)
@@ -106,17 +136,21 @@ npm run check      # análise estática de imports/exports
 
 ```
 4-paredes/
-├── index.html              # casca: quarto de fundo, topbar, tela, tabs, camadas de fx/modal
+├── index.html              # página de vendas (front door): copy, oferta e CTA do teste grátis
+├── app.html                # casca do jogo: quarto de fundo, topbar, tela, tabs, camadas de fx/modal
 ├── server.mjs              # servidor estático (0.0.0.0:4321)
 ├── sw.js                   # Service Worker (notificações)
 ├── manifest.webmanifest    # instalável como PWA
 ├── assets/
 │   └── icon.svg            # ícone do app (splash, favicon, PWA, notificações)
 ├── styles/
-│   ├── app.css             # tokens de cor, topbar, tabs, botões, mascotes, modal, fx
+│   ├── landing.css         # página de vendas (hero, ticker, oferta, FAQ, reveal)
+│   ├── mascots.css         # Chispa & Gota — compartilhado pela venda e pelo jogo
+│   ├── app.css             # tokens de cor, topbar, tabs, botões, modal, fx
 │   └── screens.css         # trilha, fase, jogos, duelo, liga, ninho, onboarding
 ├── js/
-│   ├── main.js             # boot, rotas, loop de "chamada constante"
+│   ├── landing.js          # página de vendas: mascotes, ticker, contadores, reveal
+│   ├── main.js             # boot, rotas, teste grátis (?trial=1), loop de "chamada constante"
 │   ├── router.js           # rotas por hash + limpeza de intervalos por tela
 │   ├── state.js            # progresso, ofensiva, moedas, missões, liga, loja
 │   ├── content.js          # 56 fases, 30 extras, roletas, dados, cartas, quiz, conquistas

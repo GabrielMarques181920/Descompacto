@@ -4,7 +4,7 @@
   "description": "Fases diárias, desafios e mini-jogos para casais nunca caírem na rotina.",
   "lang": "pt-BR",
   "dir": "ltr",
-  "start_url": "./",
+  "start_url": "./app.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -31,12 +31,12 @@
   "shortcuts": [
     {
       "name": "Fase de hoje",
-      "url": "./#/trilha",
+      "url": "./app.html#/trilha",
       "description": "Abrir a fase do dia"
     },
     {
       "name": "Mini-jogos",
-      "url": "./#/jogos",
+      "url": "./app.html#/jogos",
       "description": "Roleta, dados, cartas e duelo"
     }
   ]

@@ -40,6 +40,7 @@ function defaultState() {
     v: 1,
     onboarded: false,
     startDate: today,
+    trialStart: null, // vindo da página de vendas (?trial=1)
     couple: { p1: 'Você', p2: 'Amor', emoji: 'couple', since: '' },
     prefs: {
       intensity: 2,
@@ -107,6 +108,21 @@ export const S = mergeState(defaultState(), loadJSON(KEY, null))
 
 export function save() {
   saveJSON(KEY, S)
+}
+
+/* ---------------- teste grátis (7 dias, vindo da página de vendas) ---------------- */
+export const TRIAL_DAYS = 7
+
+/** dia atual do teste (1..7) e quantos faltam; active=false quando não há teste */
+export function trialInfo(now = todayKey()) {
+  if (!S.trialStart) return { active: false, day: 0, left: 0, start: null }
+  const day = daysBetween(now, S.trialStart) + 1
+  return {
+    active: day >= 1 && day <= TRIAL_DAYS,
+    day: Math.max(1, Math.min(TRIAL_DAYS, day)),
+    left: Math.max(0, TRIAL_DAYS - day),
+    start: S.trialStart,
+  }
 }
 
 export function resetAll() {

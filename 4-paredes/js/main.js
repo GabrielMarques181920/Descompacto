@@ -4,10 +4,10 @@
 import { LINES, SCENES, fillLine, playCutscene } from './mascots.js'
 import { parseRoute, paint, setRenderer } from './router.js'
 import { hideChrome, idleMascotPeek, nudge, renderTabbar, renderTopbar, toast, walkMascot } from './ui.js'
-import { S, dangerOfLosingStreak, save, syncDay, unlockedCount } from './state.js'
+import { S, dangerOfLosingStreak, save, syncDay, trialInfo, unlockedCount } from './state.js'
 import { setSound, sfx } from './audio.js'
 import { initNotifications, maybeStreakAlert, scheduleDaily } from './notify.js'
-import { pick, qs } from './util.js'
+import { pick, qs, todayKey } from './util.js'
 
 import { renderOnboarding } from './screens/onboarding.js'
 import { renderHome, bindRender } from './screens/home.js'
@@ -88,6 +88,8 @@ function boot() {
   setTimeout(() => boot?.classList.add('off'), 420)
   setTimeout(() => boot?.remove(), 1200)
 
+  applyTrial()
+
   if (!S.onboarded) return
 
   // eventos do dia
@@ -125,6 +127,30 @@ function boot() {
   // chamada constante
   setInterval(nudgeLoop, 25_000)
   setTimeout(nudgeLoop, 12_000)
+}
+
+/* a página de vendas manda o casal para cá com ?trial=1 */
+function applyTrial() {
+  const params = new URLSearchParams(location.search)
+  if (params.get('trial') !== '1') return
+  const fresh = !S.trialStart
+  S.trialStart = S.trialStart || todayKey()
+  save()
+  history.replaceState(null, '', location.pathname + location.hash)
+  const info = trialInfo()
+  setTimeout(
+    () =>
+      toast(
+        fresh
+          ? 'Teste grátis de 7 dias ativado. Tudo liberado — a primeira fase já espera por vocês.'
+          : `Teste grátis: dia ${info.day} de 7. Faltam ${info.left} dia(s) de tudo liberado.`,
+        'hot',
+        fresh ? 4800 : 3800,
+        'gift',
+      ),
+    fresh ? 1600 : 1000,
+  )
+  if (fresh) sfx.coin()
 }
 
 function nudgeLoop() {
