@@ -538,7 +538,9 @@ check('copy tem a pergunta que incomoda', /se escolheram/i.test(landingHtml))
 check('oferta de 7 dias grátis presente', /7 dias/i.test(landingHtml) && landingHtml.includes('offer-card'))
 check('micro-trust: sem cartão, sem spam, sigilo', /Sem cartão/i.test(landingHtml) && /Sem spam/i.test(landingHtml))
 check('marcação 18+', /\+18|18 anos/.test(landingHtml))
-check('preço e depoimentos marcados como placeholder', /AJUSTE O PREÇO/.test(landingHtml) && /SUBSTITUA/.test(landingHtml))
+check('preço real definido (R$ 19,90/mês)', landingHtml.includes('R$ 19,90/mês') && !/AJUSTE O PREÇO/.test(landingHtml))
+check('preço aparece no card e no FAQ', (landingHtml.match(/R\$ 19,90/g) || []).length >= 2)
+check('depoimentos seguem marcados como placeholder', /SUBSTITUA/.test(landingHtml))
 
 // hooks que o JS da landing precisa
 for (const hook of ['hero-duo', 'final-duo', 'ticker', 'year']) {

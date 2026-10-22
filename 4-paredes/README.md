@@ -49,8 +49,8 @@ Como a página funciona:
   se escolheram?*
 - **Prova em movimento** — Chispa & Gota aparecem no herói e no fechamento, e um ticker rola com
   títulos **reais** tirados de `js/content.js` (nada de texto inventado).
-- **Oferta** — card de 7 dias grátis com preço e depoimentos **marcados como placeholder**
-  (`<!-- SUBSTITUA -->`, `<!-- AJUSTE O PREÇO -->`) para você trocar pelos reais.
+- **Oferta** — 7 dias grátis e depois **R$ 19,90/mês** (preço confirmado, também no FAQ).
+  Os 3 depoimentos seguem **placeholder** (`<!-- SUBSTITUA -->`) até existirem casais reais.
 - **Teste grátis de verdade** — chegar com `?trial=1` grava `S.trialStart` (`state.js`) e o jogo
   avisa "Teste grátis de 7 dias ativado"; `trialInfo()` diz o dia (1..7) e quantos faltam.
   Ainda não há cobrança nem bloqueio: quando você definir preço e duração, o paywall entra aqui.
