@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5" />
+    <meta name="theme-color" content="#0a090a" />
+    <meta
+      name="description"
+      content="4 Paredes — o jogo diário para casais nunca caírem na rotina. Fases, desafios, mascotes e mini-jogos picantes."
+    />
+    <title>4 Paredes · o jogo diário do casal</title>
+    <link rel="icon" type="image/svg+xml" href="./assets/icon.svg" />
+    <link rel="apple-touch-icon" href="./assets/icon.svg" />
+    <link rel="stylesheet" href="./styles/app.css" />
+    <link rel="stylesheet" href="./styles/screens.css" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+  </head>
+  <body>
+    <div id="room" aria-hidden="true">
+      <span class="wall wall-1"></span>
+      <span class="wall wall-2"></span>
+      <span class="wall wall-3"></span>
+      <span class="wall wall-4"></span>
+      <span class="glow glow-a"></span>
+      <span class="glow glow-b"></span>
+      <span class="dust" id="dust"></span>
+    </div>
+
+    <div id="app" class="app">
+      <header id="topbar" class="topbar" hidden></header>
+      <main id="screen" class="screen" role="main"></main>
+      <nav id="tabbar" class="tabbar" hidden aria-label="Navegação"></nav>
+    </div>
+
+    <canvas id="fx" class="fx-layer" aria-hidden="true"></canvas>
+    <div id="float-mascot" class="float-mascot" aria-hidden="true"></div>
+    <div id="modal-layer" class="modal-layer" hidden></div>
+    <div id="toast-layer" class="toast-layer" aria-live="polite"></div>
+    <div id="nudge-layer" class="nudge-layer" hidden></div>
+    <div id="boot" class="boot">
+      <div class="boot-crest boot-duo">
+        <img class="boot-face" src="./assets/foguinho.png" alt="Chispa, a mascote de fogo do 4 Paredes" width="96" height="96" />
+        <img class="boot-face" src="./assets/gotinha.png" alt="Gota, a mascote de água do 4 Paredes" width="96" height="96" />
+      </div>
+      <div class="boot-word">4 Paredes</div>
+      <p class="boot-sub">o jogo diário do casal</p>
+      <div class="boot-bar"><i></i></div>
+    </div>
+
+    <script>
+      // rede de segurança: o overlay de boot nunca pode prender a tela,
+      // mesmo que um módulo falhe ou demore demais para carregar
+      window.addEventListener('error', function (e) {
+        var b = document.getElementById('boot')
+        if (b && !b.classList.contains('off')) {
+          b.innerHTML =
+            '<div class="boot-word" style="font-size:16px;letter-spacing:.2em">4 Paredes</div>' +
+            '<p style="max-width:280px;text-align:center;opacity:.72">algo travou no carregamento</p>' +
+            '<p style="font-size:12px;opacity:.5;max-width:280px;text-align:center">' +
+            (e.message || 'erro desconhecido') + ' — recarregue a página</p>'
+        }
+      })
+      setTimeout(function () {
+        var b = document.getElementById('boot')
+        if (b && !b.classList.contains('off')) {
+          b.classList.add('off')
+          setTimeout(function () {
+            b.remove()
+          }, 700)
+        }
+      }, 6000)
+    </script>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>

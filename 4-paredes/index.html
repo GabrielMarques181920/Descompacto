@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a090a" />
+    <meta
+      name="description"
+      content="4 Paredes — o jogo diário do casal. 365 dias, 365 formas de manter a chama acesa. Um desafio por dia para vocês não caírem na rotina. A primeira fase é grátis; depois, R$ 19,90/mês."
+    />
+    <title>4 Paredes · Não deixe seu relacionamento cair na rotina</title>
+    <link rel="icon" type="image/svg+xml" href="./assets/icon.svg" />
+    <link rel="stylesheet" href="./styles/landing.css" />
+  </head>
+  <body>
+    <div id="room" aria-hidden="true">
+      <span class="wall wall-1"></span>
+      <span class="wall wall-2"></span>
+      <span class="wall wall-3"></span>
+      <span class="wall wall-4"></span>
+      <span class="glow glow-a"></span>
+      <span class="glow glow-b"></span>
+      <span class="dust"></span>
+    </div>
+
+    <!-- ================= topo ================= -->
+    <header class="nav">
+      <a class="brand" href="#topo">
+        <img src="./assets/icon.svg" alt="" width="34" height="34" />
+        <span class="wordmark">4 Paredes</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#como">Como funciona</a>
+        <a href="#dentro">O que tem dentro</a>
+        <a href="#faq">Dúvidas</a>
+      </nav>
+      <a class="btn sm gold" href="./app.html?trial=1">1ª fase grátis</a>
+    </header>
+
+    <main id="topo">
+      <!-- ================= hero ================= -->
+      <section class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow reveal"><i data-icon="flame" data-size="13"></i> o jogo diário do casal · +18</span>
+          <h1 class="reveal">
+            Não deixe seu relacionamento<br />cair na rotina.
+            <span class="accent">365 dias. 365 formas de manter a chama acesa.</span>
+          </h1>
+          <p class="lead reveal">
+            A rotina não chega com uma briga. Chega em silêncio — no <em>“deixa pra amanhã”</em>, no celular
+            entre vocês dois, no beijo de boa-noite no automático. O <strong>4 Paredes</strong> interrompe
+            isso com <strong>um desafio por dia</strong>. De cinco a quinze minutos que separam vocês do
+            piloto automático.
+          </p>
+          <div class="cta-row reveal">
+            <a class="btn lg" href="./app.html?trial=1">
+              <span class="shine"></span>
+              <i data-icon="flame" data-size="18"></i> Jogar a primeira fase grátis
+            </a>
+            <a class="btn lg ghost" href="#como">Ver como funciona</a>
+          </div>
+          <p class="micro reveal">
+            Sem cartão na primeira fase · Sem spam · O que acontece nas 4 paredes, fica nas 4 paredes.
+          </p>
+        </div>
+
+        <div class="hero-art reveal">
+          <div class="duo" id="hero-duo"></div>
+          <!-- mock do app -->
+          <div class="phone">
+            <div class="phone-top">
+              <span class="chip"><i data-icon="flame" data-size="14"></i> 12</span>
+              <span class="chip gold"><i data-icon="gem" data-size="14"></i> 240</span>
+              <span class="chip"><i data-icon="trophy" data-size="14"></i> Ouro</span>
+            </div>
+            <div class="phone-card">
+              <span class="phone-meta">hoje · fase 13 de 56</span>
+              <strong>A bancada proibida</strong>
+              <p>Hoje a cozinha não é só cozinha. Um desafio que começa no jantar e não termina na pia.</p>
+              <div class="phone-tags">
+                <span class="tag hot"><i data-icon="pepper" data-size="12"></i><i data-icon="pepper" data-size="12"></i><i data-icon="pepper" data-size="12"></i> fogo alto</span>
+                <span class="tag"><i data-icon="clock" data-size="12"></i> 12 min</span>
+                <span class="tag gold">+45 XP</span>
+              </div>
+              <span class="phone-cta">Jogar a fase de hoje</span>
+            </div>
+            <div class="phone-tabs">
+              <i data-icon="compass" data-size="20"></i>
+              <i data-icon="dice" data-size="20"></i>
+              <i data-icon="trophy" data-size="20"></i>
+              <i data-icon="nest" data-size="20"></i>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ticker de exemplos reais -->
+      <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
+
+      <!-- ================= consciência ================= -->
+      <section class="conscience">
+        <span class="kicker reveal">a pergunta que incomoda</span>
+        <h2 class="reveal">Quando foi a última vez que vocês se escolheram?<br /><span class="dim">Não por obrigação. Por vontade.</span></h2>
+        <div class="punches">
+          <p class="reveal"><i data-icon="moon" data-size="22"></i> Nenhum casal planeja esfriar. Vocês só pararam de se surpreender.</p>
+          <p class="reveal"><i data-icon="phoneOff" data-size="22"></i> Ainda se amam? Claro. Mas tem uma tela entre vocês há quantas noites?</p>
+          <p class="reveal"><i data-icon="snowflake" data-size="22"></i> Rotina não é falta de amor. É falta de plano. <strong>E plano a gente resolve.</strong></p>
+        </div>
+      </section>
+
+      <!-- ================= como funciona ================= -->
+      <section class="section" id="como">
+        <span class="kicker reveal">como funciona</span>
+        <h2 class="reveal">Três passos entre vocês e o piloto automático</h2>
+        <div class="steps">
+          <article class="step reveal">
+            <span class="step-n">1</span>
+            <span class="step-ic"><i data-icon="flag" data-size="26"></i></span>
+            <h3>Abram o jogo</h3>
+            <p>Um desafio novo por dia, do reencontro ao fogo alto. Vocês escolhem a intensidade — e podem mudar quando quiserem.</p>
+          </article>
+          <article class="step reveal">
+            <span class="step-n">2</span>
+            <span class="step-ic"><i data-icon="wheel" data-size="26"></i></span>
+            <h3>Deixem o jogo decidir</h3>
+            <p>Roleta, dados, baralho, quiz, cronômetro e duelo. Quando ninguém quer escolher, o jogo escolhe por vocês.</p>
+          </article>
+          <article class="step reveal">
+            <span class="step-n">3</span>
+            <span class="step-ic"><i data-icon="flame" data-size="26"></i></span>
+            <h3>Não consigam parar</h3>
+            <p>Ofensiva diária, mascotes cobrando e liga semanal contra outros casais: desistir dá mais trabalho que jogar.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ================= o que tem dentro ================= -->
+      <section class="section alt" id="dentro">
+        <span class="kicker reveal">o que tem dentro</span>
+        <h2 class="reveal">Um jogo de verdade, feito para dois</h2>
+        <div class="stats reveal">
+          <div><b data-count="56">0</b><span>fases em 8 temporadas</span></div>
+          <div><b data-count="6">0</b><span>mini-jogos a qualquer hora</span></div>
+          <div><b data-count="365">0</b><span>formas de manter a chama</span></div>
+          <div><b data-count="8">0</b><span>temporadas para jogar o ano todo</span></div>
+        </div>
+        <div class="grid">
+          <article class="feat reveal"><span class="f-ic"><i data-icon="compass" data-size="24"></i></span><h3>Trilha do casal</h3><p>56 fases em zigue-zague, uma por dia, com baús, chefes e reviravoltas.</p></article>
+          <article class="feat reveal"><span class="f-ic"><i data-icon="dice" data-size="24"></i></span><h3>6 mini-jogos</h3><p>Roleta do desejo, dados do tempero, baralho, quiz de sintonia, cronômetro e duelo.</p></article>
+          <article class="feat reveal"><span class="f-ic"><i data-icon="book" data-size="24"></i></span><h3>Diário do casal</h3><p>Nota de clima e uma frase por noite. No fim do mês, a história de vocês.</p></article>
+          <article class="feat reveal"><span class="f-ic"><i data-icon="trophy" data-size="24"></i></span><h3>Liga semanal</h3><p>Suba de liga contra outros casais. Segunda-feira zera tudo. Sem trégua.</p></article>
+          <article class="feat reveal"><span class="f-ic"><i data-icon="pepper" data-size="24"></i></span><h3>3 intensidades</h3><p>Suave, picante ou fogo alto. O jogo se adapta ao momento de vocês.</p></article>
+          <article class="feat reveal"><span class="f-ic"><i data-icon="shield" data-size="24"></i></span><h3>Privacidade total</h3><p>Sem conta, sem nuvem, sem analytics. Tudo fica no aparelho de vocês.</p></article>
+        </div>
+      </section>
+
+      <!-- ================= consentimento ================= -->
+      <section class="consent reveal">
+        <div>
+          <span class="kicker">vocês no controle. sempre.</span>
+          <h2>Intimidade não é obrigação.<br />É combinação.</h2>
+          <p class="muted">
+            O 4 Paredes aproxima — nunca pressiona. Tudo pode ser pulado, ajustado ou vetado,
+            sem culpa e sem placar contra vocês.
+          </p>
+        </div>
+        <ul>
+          <li class="reveal"><i data-icon="pepper" data-size="18"></i><span><strong>3 níveis de intensidade.</strong> Nada aparece sem vocês liberarem.</span></li>
+          <li class="reveal"><i data-icon="ban" data-size="18"></i><span><strong>Palavra de segurança.</strong> Se alguém disser, tudo para na hora. Sem discussão.</span></li>
+          <li class="reveal"><i data-icon="cards" data-size="18"></i><span><strong>Curinga sem culpa.</strong> Pular um dia não quebra a ofensiva nem o clima.</span></li>
+          <li class="reveal"><i data-icon="lock" data-size="18"></i><span><strong>+18 e offline.</strong> Conteúdo adulto opcional, dados só no aparelho.</span></li>
+        </ul>
+      </section>
+
+      <!-- ================= depoimentos ================= -->
+      <!-- SUBSTITUA por depoimentos reais quando houver -->
+      <section class="section">
+        <span class="kicker reveal">quem já jogou</span>
+        <h2 class="reveal">A rotina tinha nome. Agora tem adversário.</h2>
+        <div class="quotes">
+          <blockquote class="reveal">“A gente tinha virado colega de apartamento. Voltou a ser namorado.”<cite>Mari & Caio · 4 anos juntos</cite></blockquote>
+          <blockquote class="reveal">“Quinze minutos por dia. Parece pouco. Mudou tudo.”<cite>Pri & Dani · 2 anos juntas</cite></blockquote>
+          <blockquote class="reveal">“Meu marido não joga nada. Joga isso. Todo. Santo. Dia.”<cite>Bia & Rafa · 9 anos juntos</cite></blockquote>
+        </div>
+      </section>
+
+      <!-- ================= para quem é ================= -->
+      <section class="section alt fit">
+        <div class="fit-col yes reveal">
+          <h3><i data-icon="check" data-size="20"></i> É para vocês se…</h3>
+          <ul>
+            <li>Sentem que o namoro virou logística de casa.</li>
+            <li>Querem surpresa sem precisar planejar (nem discutir antes).</li>
+            <li>Topam 10 minutos por dia só para os dois.</li>
+            <li>Acham que intimidade também se treina — um dia de cada vez.</li>
+          </ul>
+        </div>
+        <div class="fit-col no reveal">
+          <h3><i data-icon="close" data-size="20"></i> Não é para vocês se…</h3>
+          <ul>
+            <li>Buscam terapia de casal (isso é jogo, não tratamento).</li>
+            <li>Querem que o jogo decida limites por vocês — aqui quem manda é o casal.</li>
+            <li>Não têm com quem jogar a dois.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ================= chamada intermediária ================= -->
+      <section class="cta-band">
+        <div class="cta-copy reveal">
+          <h2>Vocês podem continuar adiando.<br />Ou podem jogar a fase de hoje.</h2>
+          <p class="muted">
+            A primeira fase é de graça, sem cartão. Se vocês sentirem a diferença — e vão sentir —
+            R$ 19,90/mês libera as outras 55 fases, os 6 mini-jogos, o diário e a liga semanal.
+          </p>
+        </div>
+        <a class="btn lg reveal" href="./app.html?trial=1">
+          <span class="shine"></span><i data-icon="flame" data-size="18"></i> Jogar a primeira fase grátis
+        </a>
+      </section>
+
+      <!-- ================= oferta ================= -->
+      <section class="offer" id="oferta">
+        <div class="offer-card reveal">
+          <span class="offer-duo">
+            <span class="offer-face">
+              <img src="./assets/foguinho.png" alt="Chispa, a mascote de fogo do 4 Paredes" width="88" height="88" />
+            </span>
+            <span class="offer-face">
+              <img src="./assets/gotinha.png" alt="Gota, a mascote de água do 4 Paredes" width="88" height="88" />
+            </span>
+          </span>
+          <span class="offer-eyebrow"><i data-icon="sparkle" data-size="14"></i> comece de graça</span>
+          <div class="offer-head">
+            <b>1ª fase</b>
+            <span>grátis,<br />sem cartão</span>
+          </div>
+          <ul class="offer-list">
+            <li><i data-icon="check" data-size="15"></i> 56 fases + 8 temporadas completas</li>
+            <li><i data-icon="check" data-size="15"></i> Os 6 mini-jogos, sem limite</li>
+            <li><i data-icon="check" data-size="15"></i> Diário do casal & liga semanal</li>
+            <li><i data-icon="check" data-size="15"></i> Chispa & Gota cobrando vocês diariamente</li>
+            <li><i data-icon="check" data-size="15"></i> Privacidade total, offline</li>
+          </ul>
+          <p class="offer-price">Depois da primeira fase: <strong>R$ 19,90/mês</strong> — menos que um pedido de iFood a dois.</p>
+          <a class="btn lg gold" href="./app.html?trial=1"><span class="shine"></span><i data-icon="flame" data-size="18"></i> Quero acender de novo</a>
+          <p class="micro">Cancele em um toque, sem multa. As memórias de vocês ficam com vocês (exportáveis).</p>
+        </div>
+      </section>
+
+      <!-- ================= FAQ ================= -->
+      <section class="section" id="faq">
+        <span class="kicker reveal">dúvidas honestas</span>
+        <h2 class="reveal">O que todo casal pergunta antes de começar</h2>
+        <div class="faq">
+          <details class="reveal"><summary>É grátis mesmo?</summary><p>A primeira fase é 100% grátis e não pede cartão — é assim que vocês sentem o jogo antes de decidir. A partir da segunda fase, o passe de R$ 19,90/mês libera as 56 fases, os 6 mini-jogos, o diário e a liga.</p></details>
+          <details class="reveal"><summary>É explícito?</summary><p>Só se vocês quiserem. São três níveis de intensidade e nada aparece sem vocês liberarem. No nível suave, é carinho e conversa.</p></details>
+          <details class="reveal"><summary>Precisa dos dois?</summary><p>Sim — é um jogo a dois. Mas rola no mesmo celular, passando a tela um para o outro (o quiz inclusive exige isso).</p></details>
+          <details class="reveal"><summary>Quanto tempo por dia?</summary><p>De 5 a 15 minutos. Menos que um episódio de qualquer coisa.</p></details>
+          <details class="reveal"><summary>Funciona no celular?</summary><p>Sim. Instala como aplicativo (PWA), funciona offline e avisa no horário que vocês escolherem.</p></details>
+          <details class="reveal"><summary>Onde ficam nossos dados?</summary><p>No aparelho. Sem conta, sem nuvem, sem analytics. Dá para exportar o diário e apagar tudo quando quiserem.</p></details>
+          <details class="reveal"><summary>Quanto custa depois da primeira fase?</summary><p>R$ 19,90 por mês, no cartão. Cancele em um toque, sem multa e sem letra miúda — e o diário de vocês continua exportável.</p></details>
+          <details class="reveal"><summary>E se um dos dois não estiver a fim?</summary><p>O curinga pula o dia sem culpa e a intensidade se adapta. O jogo existe para aproximar, nunca para pressionar.</p></details>
+        </div>
+      </section>
+
+      <!-- ================= CTA final ================= -->
+      <section class="final">
+        <div class="final-duo" id="final-duo"></div>
+        <h2 class="reveal">A rotina não manda recado.<br />Ela só ocupa o espaço que vocês deixam.</h2>
+        <p class="reveal muted">Ocupem de volta. Hoje, em quinze minutos.</p>
+        <a class="btn lg reveal" href="./app.html?trial=1"><span class="shine"></span><i data-icon="flame" data-size="18"></i> Jogar a primeira fase grátis</a>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <img src="./assets/icon.svg" alt="" width="26" height="26" />
+      <span class="wordmark small">4 Paredes</span>
+      <span class="dot">·</span><span>feito com fogo & água</span>
+      <span class="dot">·</span><span>+18</span>
+      <span class="dot">·</span><a href="#topo">privacidade</a>
+      <span class="dot">·</span><a href="#topo">termos</a>
+      <span class="dot">·</span><span>© <span id="year"></span></span>
+    </footer>
+
+    <script type="module" src="./js/landing.js"></script>
+  </body>
+</html>

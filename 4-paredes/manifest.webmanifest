@@ -1,0 +1,43 @@
+{
+  "name": "4 Paredes — o jogo diário do casal",
+  "short_name": "4 Paredes",
+  "description": "Fases diárias, desafios e mini-jogos para casais nunca caírem na rotina.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "./app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a090a",
+  "theme_color": "#0a090a",
+  "categories": [
+    "games",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Fase de hoje",
+      "url": "./app.html#/trilha",
+      "description": "Abrir a fase do dia"
+    },
+    {
+      "name": "Mini-jogos",
+      "url": "./app.html#/jogos",
+      "description": "Roleta, dados, cartas e duelo"
+    }
+  ]
+}
