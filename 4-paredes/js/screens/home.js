@@ -247,6 +247,7 @@ function lightningCard() {
     const row = el('div', { class: 'row', style: { gap: '8px', marginTop: '10px' } })
     const ok = el('button', { class: 'btn green grow sm', text: 'Fizemos agora' })
     ok.onclick = () => {
+      if (!requirePremium('extra')) return
       const res = claimLightning(active)
       confetti()
       renderTopbar()

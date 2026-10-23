@@ -467,6 +467,8 @@ function dangerCard() {
   const card = el('div', { class: 'card tight' })
   card.append(el('div', { class: 'section-title', style: { margin: '2px 0 10px' } }, [el('h2', { html: `${icon('warning', 16)} Zona de risco` })]))
   const row = el('div', { class: 'row', style: { gap: '8px' } })
+  // atalho de desenvolvimento: some da frente do lead (só aparece com ?debug na URL)
+  const debug = new URLSearchParams(location.search).has('debug')
   const give = el('button', { class: 'btn ghost sm grow', text: 'Ganhar 100 brasas (teste)' })
   give.onclick = () => {
     addBrasas(100)
@@ -474,6 +476,7 @@ function dangerCard() {
     renderTopbar()
     render()
   }
+  if (!debug) give.hidden = true
   const reset = el('button', { class: 'btn danger sm grow', text: 'Zerar o jogo' })
   reset.onclick = async () => {
     const ok = await confirmDialog({

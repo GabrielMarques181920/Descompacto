@@ -70,7 +70,8 @@ Regra do funil: **o lead joga a fase 1 de graça e, a partir da segunda, precisa
 | Link direto `#/fase/u1d3` | `renderLesson` barra, volta para a trilha e abre o pagamento. |
 | Aba Jogos | Continua visível como **vitrine**: faixa do passe (`paywallBanner`), cadeado nos cards e qualquer toque abre o pagamento. |
 | Aba Liga | `paywallPanel` no lugar da tabela. |
-| Extras, relâmpago, noite surpresa | `requirePremium()` em cada clique. |
+| Extras, relâmpago (sortear **e** concluir), noite surpresa | `requirePremium()` em cada clique — nada vaza XP grátis. |
+| Zona de risco (perfil) | O atalho "Ganhar 100 brasas (teste)" só aparece com `?debug` na URL. |
 
 **Cobrança** (o app é 100% estático, então o pagamento acontece fora):
 
@@ -94,6 +95,8 @@ export const PAY = {
   liga abrem na hora, com confete. **Sem backend**: a confirmação real do pagamento depende do
   redirect do seu provedor ou do código que você enviar.
 - Preços, textos e o que entra no passe ficam em `PAY`/`INCLUDED` — nada está espalhado pelas telas.
+- Sem passe, nem truque de estado libera: maratona, dias passados, XP ou brasas não mudam
+  `unlockedCount()` (verificado no smoke, seção 14).
 
 ---
 

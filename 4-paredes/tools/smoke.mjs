@@ -658,6 +658,34 @@ check('existem fases bloqueadas sem passe', !!lockedNode)
 click(lockedNode)
 await wait(40)
 check('fase bloqueada sem passe chama o paywall (não o "abre em X dias")', /passe/i.test($('#nudge-layer')?.textContent ?? '') || !!$('#modal-layer .pay-price'))
+
+// relâmpago ativo não pode vazar XP grátis para o lead
+$('#modal-layer').hidden = true
+state.S.lightning.today = { title: 'Beijo de 2 minutos', text: 'teste de furo', xp: 25, em: 'bolt' }
+state.S.lightning.todayDate = undefined
+const xpAntes = state.S.xp
+await showRoute('#/trilha')
+const claimBtn = $$('#screen .btn').find((b) => b.textContent.includes('Fizemos agora'))
+check('relâmpago ativo aparece na trilha', !!claimBtn)
+if (claimBtn) click(claimBtn)
+await wait(60)
+check('claim do relâmpago não dá XP sem passe', state.S.xp === xpAntes, `${xpAntes}→${state.S.xp}`)
+check('claim do relâmpago abre o pagamento', !!$('#modal-layer .pay-price'))
+state.S.lightning.today = null
+$('#modal-layer').hidden = true
+
+// truques de estado não furam o gate
+state.S.prefs.marathon = true
+state.S.startDate = '2020-01-01'
+check('dias passados + maratona não liberam sem passe', state.unlockedCount() === 1, String(state.unlockedCount()))
+state.S.prefs.marathon = false
+state.S.startDate = new Date().toISOString().slice(0, 10)
+
+// atalho de desenvolvimento fora da vista do lead
+await showRoute('#/ninho')
+const debugBtn = $$('#screen .btn').find((b) => /brasas \(teste\)/.test(b.textContent))
+check('botão "ganhar brasas (teste)" escondido do lead', !debugBtn || debugBtn.hidden === true)
+
 state.markPaid('SMOKE')
 
 // vitrines do passe
