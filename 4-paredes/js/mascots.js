@@ -1,255 +1,73 @@
 /* ============================================================
    MASCOTES — Chispa (fogo) & Gota (água)
-   Um casal de opostos que se provoca: SVG animado, 7 humores,
-   falas e brigas entre fases.
+   O casal de opostos que se provoca, agora com os retratos oficiais
+   (assets/foguinho.png e assets/gotinha.png): movimento em camadas no
+   CSS, 7 humores com emote, falas e brigas entre fases.
    ============================================================ */
+import { icon } from './icons.js'
 import { el, pick } from './util.js'
 
-let svgSeq = 0
+/* retratos oficiais — a arte que o dono do app escolheu no chat */
+export const FACES = {
+  chispa: { src: './assets/foguinho.png', alt: 'Chispa, a mascote de fogo do 4 Paredes', glow: '#ff7a29' },
+  gota: { src: './assets/gotinha.png', alt: 'Gota, a mascote de água do 4 Paredes', glow: '#4cc9f0' },
+}
 
 const MOODS = ['happy', 'love', 'angry', 'sad', 'wink', 'sleepy', 'shock']
 
-/* ---------- CHISPA: a chama ---------- */
-function chispa(gid) {
-  return `
-  <g class="m-body">
-    <g class="m-legs">
-      <path d="M52 116 L48 140" stroke="#b81f0a" stroke-width="9" stroke-linecap="round"/>
-      <path d="M68 116 L72 140" stroke="#b81f0a" stroke-width="9" stroke-linecap="round"/>
-    </g>
-    <path d="M45 76 C45 71 75 71 75 76 L79 110 C79 118 41 118 41 110 Z" fill="url(#${gid}-fb)"/>
-    <g class="m-arms">
-      <path class="m-arm-l" d="M45 84 C31 84 25 74 29 66" stroke="#e5401f" stroke-width="7" fill="none" stroke-linecap="round"/>
-      <path class="m-arm-r" d="M75 84 C89 84 95 74 91 66" stroke="#e5401f" stroke-width="7" fill="none" stroke-linecap="round"/>
-    </g>
-    <ellipse cx="60" cy="54" rx="26" ry="24" fill="url(#${gid}-fb)"/>
-    <g class="m-flame-tip">
-      <path d="M60 4 C66 15 77 19 74 29 C83 27 85 36 76 40 L44 40 C35 36 37 27 46 29 C43 19 54 15 60 4 Z" fill="url(#${gid}-fh)"/>
-      <path d="M60 15 C64 21 68 24 66 30 L54 30 C52 24 56 21 60 15 Z" fill="#ffe27a" opacity=".85"/>
-    </g>
-    <g class="m-face">
-      <ellipse class="mood-blush" cx="39" cy="61" rx="7" ry="4" fill="#ff5d8f" opacity=".5"/>
-      <ellipse class="mood-blush" cx="81" cy="61" rx="7" ry="4" fill="#ff5d8f" opacity=".5"/>
-
-      <g class="mood mood-happy">
-        <g class="m-eyes">
-          <ellipse cx="49" cy="50" rx="8" ry="9.5" fill="#fff"/>
-          <ellipse cx="71" cy="50" rx="8" ry="9.5" fill="#fff"/>
-          <circle cx="50.5" cy="52" r="4" fill="#4a1206"/>
-          <circle cx="72.5" cy="52" r="4" fill="#4a1206"/>
-          <circle cx="52" cy="48.5" r="1.5" fill="#fff"/>
-          <circle cx="74" cy="48.5" r="1.5" fill="#fff"/>
-        </g>
-        <path d="M40 40 Q48 35 55 39" stroke="#7a1608" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-        <path d="M65 39 Q72 35 80 40" stroke="#7a1608" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-        <path d="M47 63 Q60 76 73 62 Q60 69 47 63 Z" fill="#4a1206"/>
-        <path d="M52 65.5 Q60 70 68 65 Q60 68 52 65.5 Z" fill="#fff"/>
-      </g>
-
-      <g class="mood mood-love">
-        <g class="m-eyes">
-          <path d="M49 44 c-6-7-14 1-8 8 l8 9 8-9 c6-7-2-15-8-8Z" fill="#e5133f"/>
-          <path d="M71 44 c-6-7-14 1-8 8 l8 9 8-9 c6-7-2-15-8-8Z" fill="#e5133f"/>
-        </g>
-        <path d="M47 62 Q60 77 73 62 Q60 69 47 62Z" fill="#4a1206"/>
-      </g>
-
-      <g class="mood mood-angry">
-        <g class="m-eyes">
-          <ellipse cx="49" cy="52" rx="7.5" ry="6.5" fill="#fff"/>
-          <ellipse cx="71" cy="52" rx="7.5" ry="6.5" fill="#fff"/>
-          <circle cx="50" cy="53" r="3.6" fill="#4a1206"/>
-          <circle cx="72" cy="53" r="3.6" fill="#4a1206"/>
-          <path d="M38 42 L56 48" stroke="#4a1206" stroke-width="4.4" stroke-linecap="round"/>
-          <path d="M82 42 L64 48" stroke="#4a1206" stroke-width="4.4" stroke-linecap="round"/>
-        </g>
-        <path d="M46 68 L52 63 L58 68 L64 63 L70 68" stroke="#4a1206" stroke-width="4" fill="none" stroke-linecap="round"/>
-      </g>
-
-      <g class="mood mood-sad">
-        <g class="m-eyes">
-          <path d="M41 50 a8 8 0 0 1 16 0Z" fill="#fff"/>
-          <path d="M63 50 a8 8 0 0 1 16 0Z" fill="#fff"/>
-          <circle cx="49" cy="50" r="3.4" fill="#4a1206"/>
-          <circle cx="71" cy="50" r="3.4" fill="#4a1206"/>
-          <path d="M78 56 q4 8 -2 10 q-6 1 -3 -10Z" fill="#7fd8ff"/>
-        </g>
-        <path d="M48 72 Q60 62 72 72" stroke="#4a1206" stroke-width="4" fill="none" stroke-linecap="round"/>
-      </g>
-
-      <g class="mood mood-wink">
-        <g class="m-eyes">
-          <path d="M41 50 q8 -8 16 0" stroke="#4a1206" stroke-width="4" fill="none" stroke-linecap="round"/>
-          <ellipse cx="71" cy="50" rx="8" ry="9.5" fill="#fff"/>
-          <circle cx="72.5" cy="52" r="4" fill="#4a1206"/>
-        </g>
-        <path d="M50 64 Q62 74 74 62" stroke="#4a1206" stroke-width="4" fill="none" stroke-linecap="round"/>
-      </g>
-
-      <g class="mood mood-sleepy">
-        <g class="m-eyes">
-          <path d="M41 52 q8 6 16 0" stroke="#4a1206" stroke-width="4" fill="none" stroke-linecap="round"/>
-          <path d="M63 52 q8 6 16 0" stroke="#4a1206" stroke-width="4" fill="none" stroke-linecap="round"/>
-        </g>
-        <ellipse cx="60" cy="68" rx="6" ry="7" fill="#4a1206"/>
-        <text x="86" y="34" font-size="16" font-weight="900" fill="#fff" opacity=".7">z</text>
-      </g>
-
-      <g class="mood mood-shock">
-        <g class="m-eyes">
-          <ellipse cx="49" cy="49" rx="10" ry="12" fill="#fff"/>
-          <ellipse cx="71" cy="49" rx="10" ry="12" fill="#fff"/>
-          <circle cx="49" cy="50" r="3.2" fill="#4a1206"/>
-          <circle cx="71" cy="50" r="3.2" fill="#4a1206"/>
-        </g>
-        <ellipse cx="60" cy="69" rx="7" ry="9" fill="#4a1206"/>
-      </g>
-    </g>
-  </g>`
-}
-
-/* ---------- GOTA: a água ---------- */
-function gota(gid) {
-  return `
-  <g class="m-body">
-    <g class="m-legs">
-      <path d="M52 118 L49 140" stroke="#1f8fd0" stroke-width="8" stroke-linecap="round"/>
-      <path d="M68 118 L71 140" stroke="#1f8fd0" stroke-width="8" stroke-linecap="round"/>
-    </g>
-    <g class="m-arms">
-      <path class="m-arm-l" d="M31 86 C19 86 14 77 18 69" stroke="#2f9fd0" stroke-width="6.5" fill="none" stroke-linecap="round"/>
-      <path class="m-arm-r" d="M89 86 C101 86 106 77 102 69" stroke="#2f9fd0" stroke-width="6.5" fill="none" stroke-linecap="round"/>
-    </g>
-    <path d="M60 8 C60 8 91 52 91 88 a31 31 0 0 1 -62 0 C29 52 60 8 60 8 Z" fill="url(#${gid}-wd)"/>
-    <path class="m-drop-tip" d="M60 2 C63 6 64.5 9 60 12 C55.5 9 57 6 60 2 Z" fill="#d9f4ff"/>
-    <ellipse class="m-gloss" cx="43" cy="66" rx="7" ry="15" fill="#fff" opacity=".5" transform="rotate(-16 43 66)"/>
-    <circle cx="40" cy="46" r="3.2" fill="#fff" opacity=".7"/>
-    <g class="m-face">
-      <ellipse class="mood-blush" cx="41" cy="92" rx="7" ry="4" fill="#ff8fb3" opacity=".55"/>
-      <ellipse class="mood-blush" cx="79" cy="92" rx="7" ry="4" fill="#ff8fb3" opacity=".55"/>
-
-      <g class="mood mood-happy">
-        <g class="m-eyes">
-          <ellipse cx="50" cy="80" rx="8" ry="9" fill="#fff"/>
-          <ellipse cx="70" cy="80" rx="8" ry="9" fill="#fff"/>
-          <circle cx="51.5" cy="82" r="4" fill="#0b3a63"/>
-          <circle cx="71.5" cy="82" r="4" fill="#0b3a63"/>
-          <circle cx="53" cy="78.5" r="1.5" fill="#fff"/>
-          <circle cx="73" cy="78.5" r="1.5" fill="#fff"/>
-          <path d="M42 72 l-4 -3 M45 70 l-3 -4 M75 70 l3 -4 M78 72 l4 -3" stroke="#0b3a63" stroke-width="2" stroke-linecap="round"/>
-        </g>
-        <path d="M42 70 Q50 66 57 70" stroke="#0b3a63" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-        <path d="M63 70 Q70 66 78 70" stroke="#0b3a63" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-        <path d="M50 95 Q60 105 70 95 Q60 100 50 95 Z" fill="#e5406b"/>
-      </g>
-
-      <g class="mood mood-love">
-        <g class="m-eyes">
-          <path d="M50 74 c-6-7-14 1-8 8 l8 9 8-9 c6-7-2-15-8-8Z" fill="#e5133f"/>
-          <path d="M70 74 c-6-7-14 1-8 8 l8 9 8-9 c6-7-2-15-8-8Z" fill="#e5133f"/>
-        </g>
-        <path d="M50 94 Q60 106 70 94 Q60 100 50 94Z" fill="#e5406b"/>
-      </g>
-
-      <g class="mood mood-angry">
-        <g class="m-eyes">
-          <ellipse cx="50" cy="82" rx="7" ry="6" fill="#fff"/>
-          <ellipse cx="70" cy="82" rx="7" ry="6" fill="#fff"/>
-          <circle cx="51" cy="83" r="3.4" fill="#0b3a63"/>
-          <circle cx="71" cy="83" r="3.4" fill="#0b3a63"/>
-          <path d="M40 72 L56 78" stroke="#0b3a63" stroke-width="4" stroke-linecap="round"/>
-          <path d="M80 72 L64 78" stroke="#0b3a63" stroke-width="4" stroke-linecap="round"/>
-        </g>
-        <path d="M47 98 L53 93 L59 98 L65 93 L71 98" stroke="#0b3a63" stroke-width="3.8" fill="none" stroke-linecap="round"/>
-      </g>
-
-      <g class="mood mood-sad">
-        <g class="m-eyes">
-          <path d="M43 80 a7.5 7.5 0 0 1 15 0Z" fill="#fff"/>
-          <path d="M62 80 a7.5 7.5 0 0 1 15 0Z" fill="#fff"/>
-          <circle cx="50" cy="80" r="3.2" fill="#0b3a63"/>
-          <circle cx="70" cy="80" r="3.2" fill="#0b3a63"/>
-          <path d="M76 86 q4 8 -2 10 q-6 1 -3 -10Z" fill="#d9f4ff"/>
-        </g>
-        <path d="M50 102 Q60 92 70 102" stroke="#0b3a63" stroke-width="3.8" fill="none" stroke-linecap="round"/>
-      </g>
-
-      <g class="mood mood-wink">
-        <g class="m-eyes">
-          <path d="M43 80 q7.5 -8 15 0" stroke="#0b3a63" stroke-width="3.8" fill="none" stroke-linecap="round"/>
-          <ellipse cx="70" cy="80" rx="8" ry="9" fill="#fff"/>
-          <circle cx="71.5" cy="82" r="4" fill="#0b3a63"/>
-          <path d="M75 70 l3 -4 M78 72 l4 -3" stroke="#0b3a63" stroke-width="2" stroke-linecap="round"/>
-        </g>
-        <path d="M51 96 Q62 105 73 95" stroke="#e5406b" stroke-width="4" fill="none" stroke-linecap="round"/>
-      </g>
-
-      <g class="mood mood-sleepy">
-        <g class="m-eyes">
-          <path d="M43 82 q7.5 6 15 0" stroke="#0b3a63" stroke-width="3.8" fill="none" stroke-linecap="round"/>
-          <path d="M62 82 q7.5 6 15 0" stroke="#0b3a63" stroke-width="3.8" fill="none" stroke-linecap="round"/>
-        </g>
-        <ellipse cx="60" cy="98" rx="5.5" ry="6.5" fill="#0b3a63"/>
-        <text x="84" y="56" font-size="15" font-weight="900" fill="#fff" opacity=".7">z</text>
-      </g>
-
-      <g class="mood mood-shock">
-        <g class="m-eyes">
-          <ellipse cx="50" cy="79" rx="9" ry="11" fill="#fff"/>
-          <ellipse cx="70" cy="79" rx="9" ry="11" fill="#fff"/>
-          <circle cx="50" cy="80" r="3" fill="#0b3a63"/>
-          <circle cx="70" cy="80" r="3" fill="#0b3a63"/>
-        </g>
-        <ellipse cx="60" cy="99" rx="6.5" ry="8" fill="#0b3a63"/>
-      </g>
-    </g>
-  </g>`
-}
-
-function defs(gid) {
-  return `
-  <defs>
-    <linearGradient id="${gid}-fh" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffe27a"/>
-      <stop offset="55%" stop-color="#ff9f1c"/>
-      <stop offset="100%" stop-color="#ff5a1f"/>
-    </linearGradient>
-    <radialGradient id="${gid}-fb" cx="42%" cy="34%" r="72%">
-      <stop offset="0%" stop-color="#ff8a4d"/>
-      <stop offset="58%" stop-color="#e5401f"/>
-      <stop offset="100%" stop-color="#b81f0a"/>
-    </radialGradient>
-    <linearGradient id="${gid}-wd" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#d9f4ff"/>
-      <stop offset="52%" stop-color="#6fd4f7"/>
-      <stop offset="100%" stop-color="#1f8fd0"/>
-    </linearGradient>
-  </defs>`
+/* cada humor veste um emote sobre a cabeça — o rosto é o retrato oficial */
+const MOOD_EMOTE = {
+  happy: 'sparkle',
+  love: 'heart',
+  angry: 'warning',
+  sad: 'drop',
+  wink: 'star',
+  sleepy: 'moon',
+  shock: 'bolt',
 }
 
 /**
- * Cria o elemento do mascote.
+ * Monta um mascote vivo a partir do retrato oficial.
+ * O movimento vem do CSS em camadas (flutuação do corpo + sombra no chão que
+ * respira + brilho pulsante + micro-respiração da imagem); o humor vem de
+ * [data-mood] (emote + movimento secundário). Mesmo contrato de antes:
  * @param {'chispa'|'gota'} kind
  * @param {string} mood
  * @param {object} opts { anim: 'idle'|'happy'|'angry'|'wave'|'sad', cls }
  */
 export function mascot(kind = 'chispa', mood = 'happy', opts = {}) {
-  const gid = `m${svgSeq++}`
-  const box = '0 0 120 150'
+  const face = FACES[kind] ?? FACES.chispa
+  const safeMood = MOODS.includes(mood) ? mood : 'happy'
   const node = el('div', {
     class: `mascot ${opts.anim ?? 'idle'} ${opts.cls ?? ''}`.trim(),
     'data-kind': kind,
-    'data-mood': MOODS.includes(mood) ? mood : 'happy',
-    html: `<svg viewBox="${box}" xmlns="http://www.w3.org/2000/svg">${defs(gid)}${
-      kind === 'gota' ? gota(gid) : chispa(gid)
-    }</svg>`,
+    'data-mood': safeMood,
   })
+  node.style.setProperty('--m-glow', face.glow)
+  node.append(
+    el('span', { class: 'm-glow', 'aria-hidden': 'true' }),
+    el('span', { class: 'm-body' }, [
+      el('img', {
+        class: 'm-img',
+        src: face.src,
+        alt: face.alt,
+        width: 120,
+        height: 120,
+        draggable: 'false',
+      }),
+    ]),
+    el('span', { class: 'm-emote', 'aria-hidden': 'true', html: icon(MOOD_EMOTE[safeMood] ?? 'sparkle', 13) }),
+    el('span', { class: 'm-shadow', 'aria-hidden': 'true' }),
+  )
   return node
 }
 
 export function setMood(node, mood, anim) {
   if (!node) return
-  node.dataset.mood = MOODS.includes(mood) ? mood : 'happy'
+  const safeMood = MOODS.includes(mood) ? mood : 'happy'
+  node.dataset.mood = safeMood
+  const emote = node.querySelector('.m-emote')
+  if (emote) emote.innerHTML = icon(MOOD_EMOTE[safeMood] ?? 'sparkle', 13)
   if (anim) node.className = `mascot ${anim}`
 }
 

@@ -145,7 +145,7 @@ check(`nós renderizados (${nodes.length})`, nodes.length === NODES.length)
 check('um nó "hoje"', $$('.node.current').length === 1)
 check('nós travados', $$('.node.locked').length === NODES.length - 1)
 check('missões diárias', $('#screen').textContent.includes('Missões de hoje'))
-check('mascote no nó atual', !!$('.node.current .mascot svg'))
+check('mascote no nó atual', !!$('.node.current .mascot img.m-img'))
 check('fases liberadas = 1', state.unlockedCount() === 1)
 
 /* ---------- 3. fase ---------- */
@@ -250,7 +250,7 @@ await wait(60)
 click($$('.game-card').find((c) => c.textContent.includes('Duelo')))
 await wait(60)
 check('arena do duelo', !!$('.battle-arena'))
-check('dois mascotes na arena', $$('.fighter .mascot svg').length === 2)
+check('dois mascotes na arena', $$('.fighter .mascot img.m-img').length === 2)
 click($$('.sheet .btn').find((b) => b.textContent.includes('Começar o duelo')))
 await wait(100)
 const zone = $('.tap-zone')
@@ -489,20 +489,31 @@ check('manifest standalone + pt-BR', manifest.display === 'standalone' && manife
 
 // 8. mascotes: o casal fogo + água
 const M = await import('../js/mascots.js')
-for (const kind of ['chispa', 'gota']) {
+for (const [kind, src] of [['chispa', 'foguinho.png'], ['gota', 'gotinha.png']]) {
   const node = M.mascot(kind, 'happy', {})
-  const moods = node.querySelectorAll('.mood').length
-  check(`mascote ${kind} tem os 7 humores`, moods === 7, String(moods))
-  check(`mascote ${kind} tem corpo animável (.m-body)`, !!node.querySelector('.m-body'))
-  check(`mascote ${kind} tem braço de aceno (.m-arm-r)`, !!node.querySelector('.m-arm-r'))
+  const img = node.querySelector('img.m-img')
+  check(`mascote ${kind} usa o retrato oficial (${src})`, img?.getAttribute('src') === `./assets/${src}`, img?.getAttribute('src') ?? 'sem img')
+  check(`mascote ${kind} tem camadas de movimento`, ['.m-body', '.m-glow', '.m-shadow', '.m-emote'].every((c) => node.querySelector(c)))
+  check(`mascote ${kind} tem alt descritivo`, (img?.getAttribute('alt') ?? '').length > 8)
 }
+check('FACES expõe os dois retratos', M.FACES.chispa.src.includes('foguinho.png') && M.FACES.gota.src.includes('gotinha.png'))
+check('retratos existem no disco', existsSync(join(root, 'assets/foguinho.png')) && existsSync(join(root, 'assets/gotinha.png')))
 check('dupla é Chispa + Gota (sem Fósforo)', !!M.VOICES.chispa && !!M.VOICES.gota && !M.VOICES.fosforo)
-const chispaSvg = M.mascot('chispa', 'happy', {}).innerHTML
-const gotaSvg = M.mascot('gota', 'happy', {}).innerHTML
-check('Chispa é fogo (gradiente quente)', chispaSvg.includes('ff9f1c') && chispaSvg.includes('e5401f'))
-check('Gota é água (gradiente frio)', gotaSvg.includes('6fd4f7') && gotaSvg.includes('1f8fd0'))
-check('Gota tem brilho + ponta animados', gotaSvg.includes('m-gloss') && gotaSvg.includes('m-drop-tip'))
-check('Chispa tem cabelo de chama animado', chispaSvg.includes('m-flame-tip'))
+const moodNode = M.mascot('chispa', 'happy', {})
+const emotes = new Set(
+  ['happy', 'love', 'angry', 'sad', 'wink', 'sleepy', 'shock'].map((m) => {
+    M.setMood(moodNode, m)
+    return moodNode.querySelector('.m-emote').innerHTML
+  }),
+)
+check('7 humores trocam o emote', emotes.size === 7, String(emotes.size))
+M.setMood(moodNode, 'nada-ver')
+check('humor inválido cai em happy', moodNode.dataset.mood === 'happy', moodNode.dataset.mood)
+const mascotsSrc = readFileSync(join(root, 'js/mascots.js'), 'utf8')
+check('SVG antigo dos mascotes removido', !mascotsSrc.includes('<svg') && !mascotsSrc.includes('m-flame-tip'))
+check('CSS dos mascotes tem os 7 humores', ['love', 'angry', 'sad', 'happy', 'wink', 'sleepy', 'shock'].every((m) => mascotsCss.includes(`[data-mood="${m}"]`)))
+check('CSS tem movimento em camadas', ['mascotFloat', 'mascotHop', 'mascotRage', 'mShadow', 'mGlow', 'mBreath'].every((k) => mascotsCss.includes(`@keyframes ${k}`)))
+check('mascotes respeitam prefers-reduced-motion', /prefers-reduced-motion/.test(mascotsCss))
 const allSrc = jsFiles.map((f) => readFileSync(f, 'utf8')).join('')
 check('nenhuma referência ao mascote antigo no código', !/fosforo/i.test(allSrc))
 check('cutscenes e duelos usam a dupla nova', allSrc.includes("mascot('gota'") || allSrc.includes('mascot(\'gota\''))

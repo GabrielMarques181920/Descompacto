@@ -137,10 +137,14 @@ export const PAY = {
 - ⚡ **Desafio relâmpago** — aparece do nada, vale XP extra.
 
 ### Mascotes: Chispa & Gota
-- **Chispa** é o fogo (chama antropomórfica) e **Gota** é a água (personagem-gota): um casal de
-  opostos que se provoca e se resolve. Ambos são SVG desenhado à mão, com
-  7 humores (feliz, apaixonado, bravo, triste, piscada, sono, choque), piscada automática,
-  língua de fogo tremulando, braços acenando e animações de pulo, flutuação e raiva.
+- **Chispa** é o fogo e **Gota** é a água: um casal de opostos que se provoca e se resolve.
+  Os dois são os **retratos oficiais escolhidos pelo dono do app** — `assets/foguinho.png` e
+  `assets/gotinha.png` (512 px) — renderizados por `js/mascots.js` com movimento em camadas no
+  CSS (`styles/mascots.css`): aura pulsante quente/fria, corpo que flutua com squash & stretch,
+  micro-respiração e brilho na imagem, sombra no chão que respira junto e, por humor
+  (feliz, apaixonado, bravo, triste, piscada, sono, choque), um emote que pipoca sobre a cabeça.
+  O SVG antigo saiu do código; o contrato `mascot(kind, mood, {anim, cls})` / `setMood()` é o mesmo,
+  então trilha, duelos, cutscenes, paywall e landing trocaram de arte sem mudar uma linha de tela.
 - Eles **conversam** em balões, **brigam entre fases** (cutscenes de diálogo no onboarding,
   depois de cada chefe, quando a ofensiva cai e quando ninguém joga) e **provocam** durante os duelos.
 - **Chamada constante**: a cada ~2,5 minutos sem fase cumprida, um mascote atravessa a tela
