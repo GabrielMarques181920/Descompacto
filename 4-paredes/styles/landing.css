@@ -901,7 +901,6 @@ main {
 /* ---------- rosto da Chispa no card de oferta ---------- */
 .offer-face {
   justify-self: center;
-  margin-top: -74px;
   display: grid;
   place-items: center;
   width: 96px;
@@ -921,4 +920,17 @@ main {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+}
+.offer-duo {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  margin-top: -74px;
+}
+.offer-duo .offer-face {
+  margin-top: 0;
+  justify-self: auto;
+}
+.offer-duo .offer-face:last-child {
+  margin-left: -24px;
 }

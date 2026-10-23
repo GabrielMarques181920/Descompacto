@@ -1463,3 +1463,21 @@ kbd {
   border-color: rgba(201, 162, 39, 0.35);
   background: linear-gradient(120deg, rgba(140, 28, 57, 0.3), var(--surface) 65%);
 }
+/* o casal lado a lado (fogo à frente, água encostada) */
+.boot-duo {
+  display: flex;
+  align-items: center;
+  width: auto;
+  height: auto;
+}
+.boot-duo .boot-face:last-child {
+  margin-left: -22px;
+}
+.face-duo {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+.face-duo .chispa-face:last-child {
+  margin-left: -16px;
+}

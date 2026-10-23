@@ -275,10 +275,13 @@ export function renderOnboarding(host) {
     const portrait = el('div', { class: 'card tight onb-portrait' })
     portrait.innerHTML = `
       <div class="row" style="gap:12px;align-items:center">
-        <img class="chispa-face" src="./assets/foguinho.png" alt="Rosto da Chispa, a mascote de fogo" width="64" height="64" />
+        <span class="face-duo">
+          <img class="chispa-face" src="./assets/foguinho.png" alt="Rosto da Chispa, a mascote de fogo" width="64" height="64" />
+          <img class="chispa-face" src="./assets/gotinha.png" alt="Rosto da Gota, a mascote de água" width="64" height="64" />
+        </span>
         <span class="grow">
-          <strong style="display:block;font-size:14px">Chispa, o fogo da casa</strong>
-          <span class="tiny muted">É ela quem cobra a fase de vocês, provoca a Gota e comemora cada ofensiva. A Gota chega junto — mas o rosto do jogo é este aqui.</span>
+          <strong style="display:block;font-size:14px">Chispa & Gota, o fogo e a água da casa</strong>
+          <span class="tiny muted">Eles cobram a fase de vocês, brigam entre si e comemoram cada ofensiva. O fogo aquece, a água acalma — e os dois não deixam a rotina entrar.</span>
         </span>
       </div>`
     box.append(portrait)
