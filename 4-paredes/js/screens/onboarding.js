@@ -272,6 +272,17 @@ export function renderOnboarding(host) {
       duo,
     )
 
+    const portrait = el('div', { class: 'card tight onb-portrait' })
+    portrait.innerHTML = `
+      <div class="row" style="gap:12px;align-items:center">
+        <img class="chispa-face" src="./assets/foguinho.png" alt="Rosto da Chispa, a mascote de fogo" width="64" height="64" />
+        <span class="grow">
+          <strong style="display:block;font-size:14px">Chispa, o fogo da casa</strong>
+          <span class="tiny muted">É ela quem cobra a fase de vocês, provoca a Gota e comemora cada ofensiva. A Gota chega junto — mas o rosto do jogo é este aqui.</span>
+        </span>
+      </div>`
+    box.append(portrait)
+
     const card = el('div', { class: 'card' })
     card.innerHTML = `
       <h2 style="margin-bottom:10px">Como funciona</h2>

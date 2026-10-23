@@ -712,6 +712,20 @@ check('paywall não usa emoji', !EMOJI_RE.test(paywallSrc))
 check('paywall não usa cores banidas', !BANNED.some((c) => paywallSrc.toLowerCase().includes(c)))
 check('volta do checkout desbloqueia (?paid=1 / ?code=)', paywallSrc.includes('checkUnlockFromUrl') && paywallSrc.includes('paidParam'))
 
+/* ---------- 15. rosto da Chispa (assets/foguinho.png) ---------- */
+console.log('\n15) Rosto da Chispa')
+const facePath = join(root, 'assets/foguinho.png')
+check('assets/foguinho.png existe', existsSync(facePath))
+const faceBytes = existsSync(facePath) ? statSync(facePath).size : 0
+check('PNG otimizado para web (< 400 KB)', faceBytes > 0 && faceBytes < 400_000, `${Math.round(faceBytes / 1024)} KB`)
+check('splash mostra o rosto da Chispa', appHtml.includes('./assets/foguinho.png') && /boot-crest boot-face/.test(appHtml))
+check('splash mantém crest + wordmark (contrato)', appHtml.includes('boot-crest') && appHtml.includes('boot-word'))
+check('onboarding apresenta a Chispa com retrato', readFileSync(join(root, 'js/screens/onboarding.js'), 'utf8').includes('./assets/foguinho.png'))
+check('card de oferta da landing tem o rosto', landingHtml.includes('./assets/foguinho.png') && landingHtml.includes('offer-face'))
+check('CSS do rosto nos dois lados', appCss.includes('.boot-face') && appCss.includes('.chispa-face') && landingCss.includes('.offer-face'))
+check('SVG animado segue onde há movimento', readFileSync(join(root, 'js/screens/home.js'), 'utf8').includes("mascot(") && readFileSync(join(root, 'js/paywall.js'), 'utf8').includes("mascot("))
+check('ícone do app (casal) continua sendo o SVG', manifest.icons.every((i) => i.src.includes('assets/icon.svg')) && appHtml.includes('./assets/icon.svg'))
+
 console.log(`\n${'='.repeat(46)}`)
 console.log(`erros capturados: ${errors.length}`)
 for (const e of errors.slice(0, 8)) console.log('   ⚠️ ', e)
