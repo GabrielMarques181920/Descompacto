@@ -1437,27 +1437,25 @@ kbd {
    ROSTO DA CHISPA — assets/foguinho.png (telas estáticas)
    O SVG animado continua onde há movimento; aqui, o retrato.
    ============================================================ */
+/* retratos sem fundo: flutuam sobre a tela, com aura própria por personagem */
 .boot-face {
   width: 96px;
   height: 96px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid rgba(201, 162, 39, 0.55);
-  box-shadow:
-    0 0 0 6px rgba(201, 162, 39, 0.08),
-    0 12px 34px rgba(0, 0, 0, 0.65),
-    0 0 44px rgba(255, 122, 41, 0.28);
-  background: var(--black);
+  object-fit: contain;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 26px rgba(255, 122, 41, 0.25));
+}
+.boot-face[src*="gotinha"] {
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 26px rgba(76, 201, 240, 0.25));
 }
 .chispa-face {
   flex: none;
   width: 64px;
   height: 64px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid rgba(201, 162, 39, 0.5);
-  box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.08), 0 6px 18px rgba(0, 0, 0, 0.55);
-  background: var(--black);
+  object-fit: contain;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55));
+}
+.chispa-face[src*="gotinha"] {
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 16px rgba(76, 201, 240, 0.28));
 }
 .onb-portrait {
   border-color: rgba(201, 162, 39, 0.35);

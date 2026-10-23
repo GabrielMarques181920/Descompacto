@@ -734,6 +734,11 @@ const gotaPath = join(root, 'assets/gotinha.png')
 check('assets/gotinha.png existe', existsSync(gotaPath))
 const gotaBytes = existsSync(gotaPath) ? statSync(gotaPath).size : 0
 check('PNG da Gota otimizado (< 400 KB)', gotaBytes > 0 && gotaBytes < 400_000, `${Math.round(gotaBytes / 1024)} KB`)
+// byte 25 do PNG = color type; 6 = RGBA (fundo transparente de verdade)
+const pngColorType = (f) => readFileSync(f)[25]
+check('foguinho.png sem fundo (RGBA)', pngColorType(facePath) === 6, String(pngColorType(facePath)))
+check('gotinha.png sem fundo (RGBA)', pngColorType(gotaPath) === 6, String(pngColorType(gotaPath)))
+check('nenhum badge recorta a arte transparente', !/\.boot-face \{[^}]*border-radius: 50%/.test(appCss) && !/\.offer-face \{[^}]*overflow: hidden/.test(landingCss))
 check('splash mantém crest + wordmark (contrato)', appHtml.includes('boot-crest') && appHtml.includes('boot-word'))
 const onbSrc = readFileSync(join(root, 'js/screens/onboarding.js'), 'utf8')
 check('onboarding apresenta o casal com retratos', onbSrc.includes('./assets/foguinho.png') && onbSrc.includes('./assets/gotinha.png') && onbSrc.includes('face-duo'))

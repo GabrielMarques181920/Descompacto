@@ -174,12 +174,14 @@ export const PAY = {
   água. Cada um carrega a própria paleta de personagem (laranja/vermelho e azul/ciano), enquanto
   a interface permanece vinho/preto/branco; os 7 humores e as brigas entre fases continuam.
 - **Ícone do app:** `assets/icon.svg` — as 4 paredes em branco com a chama vinho e ouro dentro.
-- **Rostos do casal:** `assets/foguinho.png` (Chispa, 512 px, ~216 KB) e `assets/gotinha.png`
-  (Gota, 512 px, ~324 KB) — retratos oficiais das mascotes no mesmo estilo (fundo vinho-preto,
-  filete dourado), usados só onde a tela é estática e sempre em par: splash de boot
+- **Rostos do casal:** `assets/foguinho.png` (Chispa, 512 px, ~102 KB) e `assets/gotinha.png`
+  (Gota, 512 px, ~123 KB) — retratos oficiais das mascotes **com fundo transparente (RGBA)**,
+  recortados por conectividade (faíscas/gotículas e olhos preservados, moldura removida), usados
+  só onde a tela é estática e sempre em par: splash de boot
   (`.boot-duo .boot-face`), cartão de apresentação no onboarding (`.face-duo .chispa-face`) e topo
-  do card de oferta da landing (`.offer-duo .offer-face`). Onde há movimento (trilha, cutscenes,
-  paywall, herói da landing) continua o SVG animado de `mascots.js`.
+  do card de oferta da landing (`.offer-duo .offer-face`) — sem recorte circular, para a
+  silhueta flutuar. Onde há movimento (trilha, cutscenes, paywall, herói da landing) o mesmo
+  retrato é animado por `js/mascots.js` + `styles/mascots.css`.
 
 ---
 
